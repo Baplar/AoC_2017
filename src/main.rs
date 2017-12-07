@@ -7,7 +7,7 @@ use std::error::Error;
 
 fn parse_args() -> Result<(String, fn(&str) -> String), String> {
     let args: Vec<String> = env::args().collect();
-    if args.len() <= 3 {
+    if args.len() <= 2 {
         return Err(String::from("not enough arguments"));
     }
 
@@ -21,7 +21,11 @@ fn parse_args() -> Result<(String, fn(&str) -> String), String> {
         Err(_) => return Err(String::from("part must be an integer (1 or 2)"))
     };
 
-    let filename = args[3].to_string();
+    let filename = if args.len() > 3 {
+        args[3].to_string()
+    } else {
+        format!("day{}", day)
+    };
 
     let solver = match get_solver(day, part) {
         Some(solver) => solver,

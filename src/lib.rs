@@ -1,9 +1,14 @@
 pub mod day1;
 pub mod day2;
 pub mod day3;
+pub mod day4;
+pub mod day5;
+pub mod day6;
+pub mod day7;
 
 use std::fs::File;
 use std::io::Read;
+extern crate regex;
 
 pub fn get_solver(day: u32, part: u32) -> Option<fn(&str) -> String>
 {
@@ -14,6 +19,14 @@ pub fn get_solver(day: u32, part: u32) -> Option<fn(&str) -> String>
         (2, 2) => Some(day2::two),
         (3, 1) => Some(day3::one),
         (3, 2) => Some(day3::two),
+        (4, 1) => Some(day4::one),
+        (4, 2) => Some(day4::two),
+        (5, 1) => Some(day5::one),
+        (5, 2) => Some(day5::two),
+        (6, 1) => Some(day6::one),
+        (6, 2) => Some(day6::two),
+        (7, 1) => Some(day7::one),
+        (7, 2) => Some(day7::two),
         _ => None
     }
 }

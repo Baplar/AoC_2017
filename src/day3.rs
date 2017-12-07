@@ -90,7 +90,6 @@ pub fn two(s: &str) -> String {
             // We compute the sum of the values of all its neighbors
             cells.iter().fold(0, |acc, cell| if neighbors(x, y, cell.x, cell.y) {acc + cell.val} else {acc})
         };
-        println!("{}: ({}, {}) => {}", index, x, y, val);
         cells.push(SpiralCell {x, y, val});
     }
 
