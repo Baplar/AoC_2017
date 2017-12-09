@@ -13,10 +13,11 @@ pub fn one(s: &str) -> String {
     while index < size {
         steps += 1;
         offsets[index] += 1;
-        if (index as isize) + offsets[index] - 1 < 0 {
+        let new_index = (index as isize) + offsets[index] - 1;
+        if new_index < 0 {
             break;
         }
-        index = ((index as isize) + offsets[index] - 1) as usize;
+        index = new_index as usize;
     }
     steps.to_string()
 }
@@ -35,6 +36,7 @@ pub fn two(s: &str) -> String {
     let mut steps = 0;
     while index < size {
         steps += 1;
+        
         let old_offset = offsets[index];
         offsets[index] += if old_offset >= 3 {
             -1
@@ -42,10 +44,11 @@ pub fn two(s: &str) -> String {
             1
         };
 
-        if (index as isize) + old_offset < 0 {
+        let new_index = (index as isize) + old_offset;
+        if new_index < 0 {
             break;
         }
-        index = ((index as isize) + old_offset) as usize;
+        index = new_index as usize;
     }
     steps.to_string()
 }

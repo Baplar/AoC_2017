@@ -2,56 +2,84 @@ use std::collections::HashMap;
 use std::collections::HashSet;
 use regex::Regex;
 
-#[derive(Debug)]
+/// A program in the tower
 pub struct Program {
     name: String,
     weight: usize,
-    children: Vec<String>,
+    children: Vec<Box<Program>>,
+    cumulated_weight: usize,
 }
 
-pub type ProgramTower = HashMap<String, Program>; 
+impl Program {
+    /// Creates a program without info on its children
+    fn new(name: &str, weight: usize) -> Program {
+        Program {name: String::from(name), weight, children: vec![], cumulated_weight: 0}
+    }
+}
 
-/// Creates a hash-map describing each node of the tree.
-fn parse_tower(s: &str) -> ProgramTower {
-    let mut map = ProgramTower::new();
+/// Stores the intermediate data needed to construct the program tree
+type ParserMap = HashMap<String, (Program, Vec<String>)>;
+
+/// Extracts the specified program from the map,
+/// and recursively calculates the information relative to its children
+fn set_children(name: &str, map_programs: &mut ParserMap) -> Result<Program, String> {
+    let (mut p, children) = map_programs.remove(name).ok_or("Not found")?;
+    let mut w = p.weight;
+    for child in children {
+        let child = set_children(&child, map_programs)?;
+        w += child.cumulated_weight;
+        p.children.push(Box::new(child));
+    }
+    p.cumulated_weight = w;
+    Ok(p)
+}
+
+/// Creates a hash-map describing each node of the tree,
+/// then returns its root.
+fn parse_tower(s: &str) -> Result<Program, String> {
     let re = match Regex::new(r"(?P<name>\w+) \((?P<weight>\d+)\)(?: -> (?P<children>.*))?") {
         Ok(re) => re,
-        Err(e) => {panic!(e);}
+        Err(e) => Err(e.to_string())?
     };
+
+    let mut map_programs: ParserMap = ParserMap::new();
 
     for program in s.trim().split("\n") {
         let caps = match re.captures(program.trim()) {
             Some(caps) => caps,
             None => {continue;}
         };
-        let name =  match caps.name("name") {
+        let name =  String::from(match caps.name("name") {
             Some(m) => m.as_str(),
-            None => "NAME NOT FOUND"
-        };
+            None => Err(String::from("Program with no name"))?
+        });
         let weight = match caps.name("weight") {
             Some(m) => m.as_str().parse().unwrap_or(0),
-            None => 0
+            None => Err(String::from("Program with no weight"))?
         };
         let children = match caps.name("children") {
-            None => vec![],
-            Some(children) => {
-                children.as_str().split(", ").map(|c| c.to_string()).collect()
-            }
+            Some(children) => children.as_str().split(", ").map(|c| c.to_string()).collect(),
+            None => vec![]
         };
-        let p = Program {name: name.to_string(), weight, children};
-        map.insert(name.to_string(), p);
+        let p = Program::new(&name, weight);
+        map_programs.insert(name, (p, children));
     }
-    map
+
+    let with_children: HashSet<String> = map_programs.values().flat_map(|&(_, ref children)| children).map(|k| k.clone()).collect();
+    let all_names: HashSet<String> = map_programs.keys().map(|k| k.clone()).collect();
+    let without_children: Vec<String> = all_names.difference(&with_children).map(|k| k.clone()).collect();
+    if without_children.len() != 1 {
+        Err(String::from("The tree has no root"))?
+    }
+
+    let root = without_children.get(0).ok_or("Root not found")?;
+    let root = set_children(&root, &mut map_programs)?;
+    Ok(root)
 }
 
-fn root(tower: &ProgramTower) -> String {
-    let keys: HashSet<String> = tower.keys().map(|k| k.to_string()).collect();
-    let children: HashSet<String> = tower.values().flat_map(|node| &node.children).map(|child| child.to_string()).collect();
-    let roots: Vec<String> = keys.difference(&children).map(|key| key.to_string()).collect();
-    roots[0].to_string()
-}
-
-/// # Examples
+/// Returns the root of the program tower
+/// 
+///  # Examples
 /// ```
 /// use advent_of_code::day7::one;
 /// let list = "\
@@ -71,58 +99,47 @@ fn root(tower: &ProgramTower) -> String {
 /// assert_eq!("tknk", one(list));
 /// ```
 pub fn one(s: &str) -> String {
-    root(&parse_tower(s))
+    match parse_tower(s) {
+        Ok(p) => p.name.to_string(),
+        Err(e) => format!("Parsing error: {}", e)
+    }
 }
 
-pub type ProgramWeights = HashMap<String, usize>;
-
-fn compute_weight(program: &str, tower: &ProgramTower, weights: &mut ProgramWeights) -> usize {
-    if let Some(w) = weights.get(program) {
-        return *w;
+/// Recursively goes down the subtree and finds
+/// the program responsible for the unbalance 
+fn find_unbalanced(program: &Program) -> Option<(&Program, usize)> {
+    if program.children.len() == 0 {
+        // No children
+        return None;
     }
 
-    let mut w = tower[program].weight;
-    for child in tower[program].children.iter() {
-        w += compute_weight(child.as_str(), tower, weights);
+    let mut children_weights: HashMap<usize, Vec<&Box<Program>>> = HashMap::new();
+    for child in program.children.iter() {
+        let w = child.cumulated_weight;
+        children_weights.entry(w).or_insert(vec![]).push(child);
+    }
+    if children_weights.len() <= 1 {
+        // All children have the same weight
+        return None;
     }
 
-    weights.insert(program.to_string(), w);
-    w
+
+    let (current_weight, culprit) = match children_weights.iter().find(|&(_, v)| v.len() == 1) {
+        Some((w, v)) => (w, v[0]),
+        None => None?
+    };
+    let (desired_weight, _) = children_weights.iter().find(|&(_, v)| v.len() > 1).unwrap();
+    let new_weight = culprit.weight + desired_weight - current_weight;
+
+    match find_unbalanced(&culprit) {
+        Some((child, adjustment)) => Some((child, adjustment)),
+        None => Some((culprit, new_weight))
+    }
 }
 
-fn adjustment_required(program: &Program, tower: &ProgramTower, weights: &ProgramWeights) -> Option<(String, usize)> {
-        if program.children.len() == 0 {
-            // No children
-            return None;
-        }
-
-        let children_weights: HashMap<usize, Vec<&str>> = program.children.iter()
-        .fold(HashMap::new(), |mut map, c| {
-            let w = weights[c];
-            if let Some(mut v) = map.remove(&w) {
-                v.push(c);
-                map.insert(w, v);
-            } else {
-                map.insert(w, vec![c]);
-            };
-            map
-        });
-        if children_weights.len() == 1 {
-            // All children have the same weight
-            return None;
-        }
-
-        let (current_weight, culprits) = children_weights.iter().find(|&(_, v)| v.len() == 1).unwrap();
-        let culprit = &tower[culprits[0]];
-        let (desired_weight, _) = children_weights.iter().find(|&(_, v)| v.len() > 1).unwrap();
-        let new_weight = culprit.weight + desired_weight - current_weight;
-
-        match adjustment_required(&culprit, &tower, &weights) {
-            Some((child, adjustment)) => Some((child, adjustment)),
-            None => Some((culprit.name.to_string(), new_weight))
-        }
-}
-
+/// Calculates the new weight to give
+/// to the unbalanced program of the tower
+/// 
 /// # Examples
 /// ```
 /// use advent_of_code::day7::two;
@@ -143,12 +160,12 @@ fn adjustment_required(program: &Program, tower: &ProgramTower, weights: &Progra
 /// assert_eq!("60", two(list));
 /// ```
 pub fn two(s: &str) -> String {
-    let tower = parse_tower(s);
-    let root = root(&tower);
-    let mut weights = ProgramWeights::new();
-    compute_weight(&root, &tower, &mut weights);
+    let root = match parse_tower(s) {
+        Ok(p) => p,
+        Err(e) => {return e.to_string();}
+    };
 
-    let (_, new_weight) = adjustment_required(&tower[&root], &tower, &weights).unwrap();
+    let (_, new_weight) = find_unbalanced(&root).unwrap();
 
     new_weight.to_string()
 }

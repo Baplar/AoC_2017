@@ -12,14 +12,8 @@
 pub fn one(s: &str) -> String {
     let checksum = |line: &str| {
         let coll: Vec<u32> = line.split_whitespace().filter_map(|n| n.parse::<u32>().ok()).collect();
-        let min = match coll.iter().min() {
-            Some(&min) => min,
-            None => 0
-        };
-        let max = match coll.iter().max() {
-            Some(&max) => max,
-            None => 0
-        };
+        let min = coll.iter().min().unwrap_or(&0);
+        let max = coll.iter().max().unwrap_or(&0);
         max - min
     };
     let result: u32 = s.split("\n").map(checksum).sum();
@@ -46,8 +40,8 @@ pub fn two(s: &str) -> String {
 
         // Finding the only pair of non-coprime numbers in the list,
         // and returning their gcd
-        for &larger in coll.iter().rev() {
-            for &lower in coll.iter().take_while(|&x| *x < larger) {
+        for larger in coll.iter().rev() {
+            for lower in coll.iter().take_while(|&x| x < larger) {
                 if larger % lower == 0 {
                     return larger / lower;
                 }

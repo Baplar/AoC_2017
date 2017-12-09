@@ -1,9 +1,6 @@
 extern crate advent_of_code;
-use advent_of_code::get_solver;
-use advent_of_code::get_input;
-
+use advent_of_code::{get_solver, get_input};
 use std::env;
-use std::error::Error;
 
 fn parse_args() -> Result<(String, fn(&str) -> String), String> {
     let args: Vec<String> = env::args().collect();
@@ -45,13 +42,13 @@ fn main() {
         }
     };
 
-    let input = match get_input(filename.as_str()) {
+    let input = match get_input(&filename) {
         Ok(contents) => contents,
         Err(e) => {
-            eprintln!("{}\n\n{}", e.description(), usage);
+            eprintln!("{}\n\n{}", e, usage);
             return;
         }
     };
 
-    println!("{}", solver(input.as_str()));
+    println!("{}", solver(&input));
 }

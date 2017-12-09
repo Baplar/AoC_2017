@@ -19,6 +19,7 @@ pub fn valid(s: &str) -> bool {
     nb_unique == nb_words
 }
 
+/// Counts the number of valid passphrases in the input
 pub fn one(s: &str) -> String {
     s.split("\n").filter(|&s| valid(s)).count().to_string()
 }
@@ -40,7 +41,7 @@ pub fn valid_anagram(s: &str) -> bool {
         .map(|w| {
             let mut chars: Vec<char> = w.chars().collect();
             chars.sort();
-            chars.iter().fold(String::new(), |acc, &c| acc + c.to_string().as_str())})
+            chars.iter().collect()})
         .collect();
     let nb_words = words.len();
     if nb_words == 0 {
@@ -53,6 +54,8 @@ pub fn valid_anagram(s: &str) -> bool {
     nb_unique == nb_words
 }
 
+/// Counts the number of valid passphrases in the input,
+/// banning anagrams
 pub fn two(s: &str) -> String {
     s.split("\n").filter(|&s| valid_anagram(s)).count().to_string()
 }

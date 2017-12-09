@@ -40,9 +40,9 @@ pub fn two(s: &str) -> String {
     let n = coll.len();
 
     // We create a first iterator on the collection
-    let first = coll.clone().into_iter();
+    let first = coll.iter();
     // Then a second iterator which skips the first character and puts it at the end
-    let second = coll.into_iter().cycle().skip(n/2).take(n);
+    let second = coll.iter().cycle().skip(n/2).take(n);
 
     // We take the sum of the "duplicated" characters
     let result: u32 = first.zip(second).filter(|&(x, y)| x == y).map(|(x, _)| x).sum();
