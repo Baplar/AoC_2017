@@ -42,42 +42,40 @@ pub fn parse(s: &str) -> Vec<Instruction> {
 /// Parses a single instruction, checking its validity
 pub fn parse_instruction(s: &str) -> Result<Instruction, String> {
     if s.trim().split_whitespace().count() != 7 {
-        Err(String::from("Malformed instruction"))?
+        Err(format!("Malformed instruction: {}", s))?
     }
     let mut tokens = s.trim().split_whitespace();
 
-    let target = String::from(tokens.next().unwrap());
+    let target = String::from(tokens.next().ok_or("Missing target register")?);
 
-    let op = tokens.next().unwrap();
-    let op: Op = match op {
+    let op = match tokens.next().ok_or("Missing operation")? {
         "inc" => INC,
         "dec" => DEC,
-        _ => Err(format!("Unknown operation {}", op))?
+        x => Err(format!("Unknown operation {}", x))?
     };
     
-    let val = tokens.next().unwrap();
+    let val = tokens.next().ok_or("Missing operation value")?;
     let val: isize = match val.parse() {
         Ok(v) => v,
         Err(e) => Err(format!("Could not parse {} as int: {}", val, e))?
     };
 
     // "if"
-    tokens.next();
+    tokens.next().ok_or("Missing if statement")?;
 
-    let compared = String::from(tokens.next().unwrap());
+    let compared = String::from(tokens.next().ok_or("Missing compared register")?);
 
-    let cmp = tokens.next().unwrap();
-    let cmp: Cmp = match cmp {
+    let cmp = match tokens.next().ok_or("Missing comparator")? {
         "==" => EQ,
         "!=" => NE,
         "<" => LT,
         "<=" => LE,
         ">" => GT,
         ">=" => GE,
-        _ => Err(format!("Unknown comparison {}", cmp))?
+        x => Err(format!("Unknown comparator {}", x))?
     };
 
-    let cond = tokens.next().unwrap();
+    let cond = tokens.next().ok_or("Missing condition")?;
     let cond: isize = match cond.parse() {
         Ok(v) => v,
         Err(e) => Err(format!("Could not parse {} as int: {}", cond, e))?

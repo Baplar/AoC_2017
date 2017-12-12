@@ -42,7 +42,7 @@ fn parse_tower(s: &str) -> Result<Program, String> {
         Err(e) => Err(e.to_string())?
     };
 
-    let mut map_programs: ParserMap = ParserMap::new();
+    let mut map_programs = ParserMap::new();
 
     for program in s.trim().split("\n") {
         let caps = match re.captures(program.trim()) {
@@ -65,8 +65,8 @@ fn parse_tower(s: &str) -> Result<Program, String> {
         map_programs.insert(name, (p, children));
     }
 
-    let with_children: HashSet<String> = map_programs.values().flat_map(|&(_, ref children)| children).map(|k| k.clone()).collect();
     let all_names: HashSet<String> = map_programs.keys().map(|k| k.clone()).collect();
+    let with_children = map_programs.values().flat_map(|&(_, ref children)| children).map(|k| k.clone()).collect();
     let without_children: Vec<String> = all_names.difference(&with_children).map(|k| k.clone()).collect();
     if without_children.len() != 1 {
         Err(String::from("The tree has no root"))?
@@ -113,7 +113,7 @@ fn find_unbalanced(program: &Program) -> Option<(&Program, usize)> {
         return None;
     }
 
-    let mut children_weights: HashMap<usize, Vec<&Box<Program>>> = HashMap::new();
+    let mut children_weights = HashMap::new();
     for child in program.children.iter() {
         let w = child.cumulated_weight;
         children_weights.entry(w).or_insert(vec![]).push(child);
@@ -128,7 +128,7 @@ fn find_unbalanced(program: &Program) -> Option<(&Program, usize)> {
         Some((w, v)) => (w, v[0]),
         None => None?
     };
-    let (desired_weight, _) = children_weights.iter().find(|&(_, v)| v.len() > 1).unwrap();
+    let (desired_weight, _) = children_weights.iter().find(|&(_, v)| v.len() > 1)?;
     let new_weight = culprit.weight + desired_weight - current_weight;
 
     match find_unbalanced(&culprit) {
@@ -165,7 +165,9 @@ pub fn two(s: &str) -> String {
         Err(e) => {return e.to_string();}
     };
 
-    let (_, new_weight) = find_unbalanced(&root).unwrap();
-
-    new_weight.to_string()
+    if let Some((_, new_weight)) = find_unbalanced(&root) {
+        new_weight.to_string()
+    } else {
+        format!("No single culprit found")
+    }
 }

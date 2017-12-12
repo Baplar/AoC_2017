@@ -1,44 +1,47 @@
-/// Redistributes the blocks of the bank with the most blocks
-/// 
-/// # Examples
-/// ```
-/// use advent_of_code::day6::redistribute;
-/// let banks = vec![0, 2, 7, 0];
-/// let banks = redistribute(&banks);
-/// assert_eq!(banks, [2, 4, 1, 2]);
-/// let banks = redistribute(&banks);
-/// assert_eq!(banks, [3, 1, 2, 3]);
-/// let banks = redistribute(&banks);
-/// assert_eq!(banks, [0, 2, 3, 4]);
-/// let banks = redistribute(&banks);
-/// assert_eq!(banks, [1, 3, 4, 1]);
-/// let banks = redistribute(&banks);
-/// assert_eq!(banks, [2, 4, 1, 2]);
-/// ```
-pub fn redistribute(banks: &Vec<usize>) -> Vec<usize> {
-    let n = banks.len();
-    let (i_max, max) = {
-        let mut i_max = 0;
-        let mut max = 0;
-        for (i, &val) in banks.iter().enumerate() {
-            if val > max {
-                i_max = i;
-                max = val;
+#[derive(PartialEq, Clone)]
+pub struct MemoryBank {
+    pub bank: Vec<usize>
+}
+
+impl MemoryBank {
+    pub fn new(s: &str) -> Self {
+        Self {bank: s.split_whitespace().filter_map(|w| w.parse().ok()).collect()}
+    }
+
+    /// Redistributes the blocks of the bank with the most blocks
+    /// 
+    /// # Examples
+    /// ```
+    /// use advent_of_code::day6::MemoryBank;
+    /// let b = MemoryBank::new("0 2 7 0");
+    /// let b = b.redistribute();
+    /// assert_eq!(b.bank, [2, 4, 1, 2]);
+    /// let b = b.redistribute();
+    /// assert_eq!(b.bank, [3, 1, 2, 3]);
+    /// let b = b.redistribute();
+    /// assert_eq!(b.bank, [0, 2, 3, 4]);
+    /// let b = b.redistribute();
+    /// assert_eq!(b.bank, [1, 3, 4, 1]);
+    /// let b = b.redistribute();
+    /// assert_eq!(b.bank, [2, 4, 1, 2]);
+    /// ```
+    pub fn redistribute(&self) -> Self {
+        let n = self.bank.len();
+        let (i_max, max) = self.bank.
+            iter().enumerate()
+            .fold((0,0), |(i_max, max), (i, &val)| if val > max {(i, val)} else {(i_max, max)});
+        let q = max / n;
+        let r = max % n;
+        let mut new_bank = self.clone();
+        new_bank.bank[i_max] = 0;
+        for i in 0..n {
+            new_bank.bank[i] += q;
+            if (n + i - (i_max + 1)) % n < r {
+                new_bank.bank[i] += 1;
             }
-        }
-        (i_max, max)
-    };
-    let q = max / n;
-    let r = max % n;
-    let mut new_banks = banks.clone();
-    new_banks[i_max] = 0;
-    for i in 0..n {
-        new_banks[i] += q;
-        if (n + i - (i_max + 1)) % n < r {
-            new_banks[i] += 1;
-        }
-    };
-    new_banks
+        };
+        new_bank
+    }
 }
 
 /// Finds the number of iterations before looping
@@ -49,16 +52,17 @@ pub fn redistribute(banks: &Vec<usize>) -> Vec<usize> {
 /// assert_eq!("5", one("0 2 7 0"));
 /// ```
 pub fn one(s: &str) -> String {
-    let banks: Vec<usize> = s.split_whitespace().filter_map(|w| w.parse().ok()).collect();
-    let mut all_banks = vec![banks];
+    let mut bank = MemoryBank::new(s);
+    let mut all_banks = vec![];
     let mut i = 0;
     loop {
-        i += 1;
-        let banks = redistribute(all_banks.last().unwrap());
-        if all_banks.iter().any(|b| *b == banks) {
+        if all_banks.iter().any(|b| *b == bank) {
             break;
         }
-        all_banks.push(banks);
+        let new_bank = bank.redistribute();
+        all_banks.push(bank);
+        bank = new_bank;
+        i += 1;
     };
     i.to_string()
 }
@@ -71,16 +75,17 @@ pub fn one(s: &str) -> String {
 /// assert_eq!("4", two("0 2 7 0"));
 /// ```
 pub fn two(s: &str) -> String {
-    let banks: Vec<usize> = s.split_whitespace().filter_map(|w| w.parse().ok()).collect();
-    let mut all_banks = vec![banks];
+    let mut bank = MemoryBank::new(s);
+    let mut all_banks = vec![];
     let mut i = 0;
     let j = loop {
-        i += 1;
-        let banks = redistribute(all_banks.last().unwrap());
-        if let Some(j) = all_banks.iter().position(|b| *b == banks) {
+        if let Some(j) = all_banks.iter().position(|b| *b == bank) {
             break i - j;
         }
-        all_banks.push(banks);
+        let new_bank = bank.redistribute();
+        all_banks.push(bank);
+        bank = new_bank;
+        i += 1;
     };
     j.to_string()
 }

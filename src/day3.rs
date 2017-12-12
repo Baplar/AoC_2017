@@ -56,7 +56,7 @@ fn spiral_coord_from_index(index: u64) -> Cell {
 /// assert_eq!("31", one("1024"));
 /// ```
 pub fn one(s: &str) -> String {
-    let index: u64 = s.trim().parse().unwrap_or(1);
+    let index = s.trim().parse().unwrap_or(1);
     let cell = spiral_coord_from_index(index);
     (cell.x.abs() + cell.y.abs()).to_string()
 }
@@ -84,9 +84,9 @@ fn sum_neighbors(target: &Cell, cells: &HashMap<Cell, u64>) -> u64 {
 /// assert_eq!("10", two("6"));
 /// ```
 pub fn two(s: &str) -> String {
-    let objective: u64 = s.trim().parse().unwrap_or(1);
+    let objective = s.trim().parse().unwrap_or(1);
 
-    let mut cells: HashMap<Cell, u64> = HashMap::new();
+    let mut cells = HashMap::new();
 
     let mut index = 1;
     let mut val = 1;

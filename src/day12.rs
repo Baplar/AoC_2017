@@ -27,7 +27,7 @@ impl Parser {
             Err(e) => Err(e.to_string())?
         };
 
-        let neighbors: HashSet<usize> = caps[2]
+        let neighbors = caps[2]
             .split(", ")
             .filter_map(|n| n.parse().ok())
             .collect();
@@ -38,7 +38,7 @@ impl Parser {
     /// Parses a list of pipe definitions
     /// /!\ The list must be ordered by root and complete
     fn parse_neighbors(&self, s: &str) -> HashMap<usize, HashSet<usize>> {
-        let v: HashMap<usize, HashSet<usize>> = s.trim()
+        let v = s.trim()
             .split("\n")
             .filter_map(|s| self.parse_pipe(s.trim()).ok())
             .collect();    
