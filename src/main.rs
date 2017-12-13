@@ -15,7 +15,7 @@ fn parse_args() -> Result<(String, fn(&str) -> String), String> {
     let filename = if args.len() > 3 {
         args[3].to_string()
     } else {
-        format!("day{}", day)
+        format!("input/day{}", day)
     };
 
     let solver = get_solver(day, part)
@@ -24,7 +24,7 @@ fn parse_args() -> Result<(String, fn(&str) -> String), String> {
 }
 
 fn main() {
-    let usage = "Usage: advent_of_code [day] [part] [input]";
+    let usage = "Usage: advent_of_code (day) (part) [input_file]";
 
     let (filename, solver) = match parse_args() {
         Ok((filename, solver)) => (filename, solver),
