@@ -54,11 +54,8 @@ pub fn parse_instruction(s: &str) -> Result<Instruction, String> {
         x => Err(format!("Unknown operation {}", x))?
     };
     
-    let val = tokens.next().ok_or("Missing operation value")?;
-    let val: isize = match val.parse() {
-        Ok(v) => v,
-        Err(e) => Err(format!("Could not parse {} as int: {}", val, e))?
-    };
+    let val = tokens.next().ok_or("Missing operation value")?
+        .parse().map_err(|e| format!("Could not parse value as int: {}", e))?;
 
     // "if"
     tokens.next().ok_or("Missing if statement")?;
@@ -75,11 +72,8 @@ pub fn parse_instruction(s: &str) -> Result<Instruction, String> {
         x => Err(format!("Unknown comparator {}", x))?
     };
 
-    let cond = tokens.next().ok_or("Missing condition")?;
-    let cond: isize = match cond.parse() {
-        Ok(v) => v,
-        Err(e) => Err(format!("Could not parse {} as int: {}", cond, e))?
-    };
+    let cond = tokens.next().ok_or("Missing condition")?
+        .parse().map_err(|e| format!("Could not parse condition as int: {}", e))?;
 
     Ok(Instruction {target, op, val, compared, cmp, cond})
 }

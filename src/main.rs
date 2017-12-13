@@ -8,15 +8,9 @@ fn parse_args() -> Result<(String, fn(&str) -> String), String> {
         return Err(String::from("not enough arguments"));
     }
 
-    let day: u32 = match args[1].parse() {
-        Ok(day) => day,
-        Err(_) => return Err(String::from("day must be an integer (1 to 25)"))
-    };
+    let day: u32 = args[1].parse().or(Err(String::from("day must be an integer (1 to 25)")))?;
 
-    let part: u32 = match args[2].parse() {
-        Ok(part) => part,
-        Err(_) => return Err(String::from("part must be an integer (1 or 2)"))
-    };
+    let part: u32 = args[2].parse().or(Err(String::from("part must be an integer (1 or 2)")))?;
 
     let filename = if args.len() > 3 {
         args[3].to_string()
@@ -24,10 +18,8 @@ fn parse_args() -> Result<(String, fn(&str) -> String), String> {
         format!("day{}", day)
     };
 
-    let solver = match get_solver(day, part) {
-        Some(solver) => solver,
-        None => return Err(format!("the function for day {}, part {} has not been implemented yet", day, part))
-    };
+    let solver = get_solver(day, part)
+        .ok_or(format!("the function for day {}, part {} has not been implemented yet", day, part))?;
     Ok((filename, solver))
 }
 
@@ -38,7 +30,7 @@ fn main() {
         Ok((filename, solver)) => (filename, solver),
         Err(reason) => {
             eprintln!("{}\n\n{}", reason, usage);
-            return;
+            std::process::exit(1);
         }
     };
 
@@ -46,7 +38,7 @@ fn main() {
         Ok(contents) => contents,
         Err(e) => {
             eprintln!("{}\n\n{}", e, usage);
-            return;
+            std::process::exit(2);
         }
     };
 

@@ -8,24 +8,15 @@ struct Parser {
 
 impl Parser {
     fn new() -> Result<Self, Error> {
-        let re = match Regex::new(r"(\d+) <-> (\d+(?:, \d+)*)") {
-            Ok(re) => re,
-            Err(e) => Err(e)?
-        };
+        let re = Regex::new(r"(\d+) <-> (\d+(?:, \d+)*)")?;
         Ok(Parser {re})
     }
 
     /// Parses a pipe definition string
     fn parse_pipe(&self, s: &str) -> Result<(usize, HashSet<usize>), String> {
-        let caps = match self.re.captures(s.trim()) {
-            Some(caps) => caps,
-            None => Err("Not a pipe definition")?
-        };
+        let caps = self.re.captures(s.trim()).ok_or("Not a pipe definition")?;
 
-        let first: usize = match caps[1].parse() {
-            Ok(first) => first,
-            Err(e) => Err(e.to_string())?
-        };
+        let first: usize = caps[1].parse().map_err(|e| format!("Could not parse first: {}", e))?;
 
         let neighbors = caps[2]
             .split(", ")
