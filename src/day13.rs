@@ -50,9 +50,9 @@ pub fn penalty(depth: usize, range: usize, offset: usize) -> bool {
 /// ```
 pub fn one(s: &str) -> String {
     let result: usize = parse_scanners(s)
-        .iter()
-        .filter(|&&(d, r)| penalty(d, r, 0))
-        .map(|&(d, r)| d * r)
+        .into_iter()
+        .filter(|&(d, r)| penalty(d, r, 0))
+        .map(|(d, r)| d * r)
         .sum();
     result.to_string()
 }

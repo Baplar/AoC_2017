@@ -24,6 +24,13 @@ pub fn one(s: &str) -> String {
     s.split("\n").filter(|&s| valid(s)).count().to_string()
 }
 
+/// Sorts the characters of a word
+pub fn sort_word(w: &str) -> String {
+    let mut chars: Vec<char> = w.chars().collect();
+    chars.sort();
+    chars.iter().collect()
+}
+
 /// Checks the validity of a passphrase forbidding anagrams
 ///
 /// # Examples
@@ -37,11 +44,7 @@ pub fn one(s: &str) -> String {
 /// ```
 pub fn valid_anagram(s: &str) -> bool {
     let mut words: Vec<String> = s.split_whitespace()
-        .map(|w| {
-            let mut chars: Vec<char> = w.chars().collect();
-            chars.sort();
-            chars.iter().collect()
-        })
+        .map(sort_word)
         .collect();
     let nb_words = words.len();
     if nb_words == 0 {

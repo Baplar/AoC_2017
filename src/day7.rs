@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use std::collections::HashSet;
-use regex::Regex;
+use regex::{Regex, Captures};
 
 /// A program in the tower
 pub struct Program {
@@ -39,6 +39,22 @@ fn set_children(name: &str, map_programs: &mut ParserMap) -> Result<Program, Str
     Ok(p)
 }
 
+fn extract_regex(caps: Captures) -> Option<(String, (Program, Vec<String>))> {
+    let name = caps.name("name")?.as_str();
+    let weight = caps.name("weight")?.as_str().parse().ok()?;
+    let children = match caps.name("children") {
+        Some(children) => {
+            children
+                .as_str()
+                .split(", ")
+                .map(|c| c.to_string())
+                .collect()
+        }
+        None => vec![],
+    };
+    Some((name.to_string(), (Program::new(&name, weight), children)))
+}
+
 /// Creates a hash-map describing each node of the tree,
 /// then returns its root.
 fn parse_tower(s: &str) -> Result<Program, String> {
@@ -49,21 +65,7 @@ fn parse_tower(s: &str) -> Result<Program, String> {
     let mut map_programs: ParserMap = s.trim()
         .split("\n")
         .filter_map(|p| re.captures(p.trim()))
-        .filter_map(|caps| {
-            let name = caps.name("name")?.as_str();
-            let weight = caps.name("weight")?.as_str().parse().ok()?;
-            let children = match caps.name("children") {
-                Some(children) => {
-                    children
-                        .as_str()
-                        .split(", ")
-                        .map(|c| c.to_string())
-                        .collect()
-                }
-                None => vec![],
-            };
-            Some((name.to_string(), (Program::new(&name, weight), children)))
-        })
+        .filter_map(extract_regex)
         .collect();
 
     let all_names: HashSet<String> = map_programs.keys().map(|k| k.clone()).collect();

@@ -126,7 +126,7 @@ impl Path {
     /// Distance of the complete path
     fn dist(&self) -> usize {
         (0..6)
-            .map(|x| Direction::dir(x))
+            .map(Direction::dir)
             .map(|dir| self.get(&dir))
             .sum()
     }
@@ -170,8 +170,7 @@ fn parse_dir(s: &str) -> Direction {
 fn parse_path(s: &str) -> Vec<Direction> {
     s.trim()
         .split(",")
-        .map(|s| s.trim())
-        .map(|s| parse_dir(s))
+        .map(|s| parse_dir(s.trim()))
         .collect()
 }
 
