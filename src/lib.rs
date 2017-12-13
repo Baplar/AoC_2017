@@ -1,15 +1,16 @@
-pub mod day1;
-pub mod day2;
-pub mod day3;
-pub mod day4;
-pub mod day5;
-pub mod day6;
-pub mod day7;
-pub mod day8;
-pub mod day9;
-pub mod day10;
-pub mod day11;
-pub mod day12;
+// pub mod day1;
+// pub mod day2;
+// pub mod day3;
+// pub mod day4;
+// pub mod day5;
+// pub mod day6;
+// pub mod day7;
+// pub mod day8;
+// pub mod day9;
+// pub mod day10;
+// pub mod day11;
+// pub mod day12;
+pub mod day13;
 
 use std::fs::File;
 use std::io::Read;
@@ -40,8 +41,10 @@ pub fn get_solver(day: u32, part: u32) -> Option<fn(&str) -> String>
         // (10, 2) => Some(day10::two),
         // (11, 1) => Some(day11::one),
         // (11, 2) => Some(day11::two),
-        (12, 1) => Some(day12::one),
-        (12, 2) => Some(day12::two),
+        // (12, 1) => Some(day12::one),
+        // (12, 2) => Some(day12::two),
+        (13, 1) => Some(day13::one),
+        (13, 2) => Some(day13::two),
         _ => None
     }
 }
