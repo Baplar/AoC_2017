@@ -8,14 +8,14 @@ pub fn parse_group_score(stream: &mut Chars, level: usize) -> usize {
         match c {
             '{' => {
                 score += parse_group_score(stream, level + 1);
-            },
+            }
             '<' => {
                 score_garbage(stream);
-            },
+            }
             '}' => {
                 return score;
-            },
-            ',' => {}, // Continue to the next sub-group
+            }
+            ',' => {} // Continue to the next sub-group
             _ => {
                 eprintln!("Observed unexpected character '{}' in group", c);
             }
@@ -32,14 +32,14 @@ pub fn parse_group_garbage(stream: &mut Chars) -> usize {
         match c {
             '{' => {
                 score += parse_group_garbage(stream);
-            },
+            }
             '<' => {
                 score += score_garbage(stream);
-            },
+            }
             '}' => {
                 return score;
-            },
-            ',' => {}, // Continue to the next sub-group
+            }
+            ',' => {} // Continue to the next sub-group
             _ => {
                 eprintln!("Observed unexpected character '{}' in group", c);
             }
@@ -56,10 +56,10 @@ pub fn score_garbage(stream: &mut Chars) -> usize {
         match c {
             '>' => {
                 return score;
-            },
+            }
             '!' => {
                 stream.next();
-            },
+            }
             _ => {
                 score += 1;
             }
@@ -70,7 +70,7 @@ pub fn score_garbage(stream: &mut Chars) -> usize {
 }
 
 /// Calculates the score of a stream block
-/// 
+///
 /// # Examples
 /// ```
 /// use advent_of_code::day9::one;
@@ -90,7 +90,7 @@ pub fn one(s: &str) -> String {
 
 /// Calculates the number of characters
 /// in the garbage of a stream block
-/// 
+///
 /// # Examples
 /// ```
 /// use advent_of_code::day9::two;

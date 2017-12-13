@@ -1,15 +1,17 @@
 /// Calculates the difference between the maximum
 /// and minimum values in the list
 fn checksum_one(s: &str) -> u32 {
-        let coll: Vec<u32> = s.split_whitespace().filter_map(|n| n.parse().ok()).collect();
-        let min = coll.iter().min().unwrap_or(&0);
-        let max = coll.iter().max().unwrap_or(&0);
-        max - min
+    let coll: Vec<u32> = s.split_whitespace()
+        .filter_map(|n| n.parse().ok())
+        .collect();
+    let min = coll.iter().min().unwrap_or(&0);
+    let max = coll.iter().max().unwrap_or(&0);
+    max - min
 }
 
 /// Calculates the checksum of the spreadsheet
 /// with the first definition
-/// 
+///
 /// # Examples
 /// ```
 /// use advent_of_code::day2::one;
@@ -27,26 +29,28 @@ pub fn one(s: &str) -> String {
 /// Calculates the gcd of the only pair
 /// of non-coprime numbers in the list
 fn checksum_two(s: &str) -> u32 {
-        // Unique elements sorted 
-        let mut coll: Vec<u32> = s.split_whitespace().filter_map(|n| n.parse().ok()).collect();
-        coll.sort();
-        coll.dedup();
+    // Unique elements sorted
+    let mut coll: Vec<u32> = s.split_whitespace()
+        .filter_map(|n| n.parse().ok())
+        .collect();
+    coll.sort();
+    coll.dedup();
 
-        // Finding the only pair of non-coprime numbers in the list,
-        // and returning their gcd
-        for larger in coll.iter().rev() {
-            for lower in coll.iter().take_while(|&x| x < larger) {
-                if larger % lower == 0 {
-                    return larger / lower;
-                }
+    // Finding the only pair of non-coprime numbers in the list,
+    // and returning their gcd
+    for larger in coll.iter().rev() {
+        for lower in coll.iter().take_while(|&x| x < larger) {
+            if larger % lower == 0 {
+                return larger / lower;
             }
         }
-        0
+    }
+    0
 }
 
 /// Calculates the checksum of the spreadsheet
 /// with the second definition
-/// 
+///
 /// # Examples
 /// ```
 /// use advent_of_code::day2::two;

@@ -14,20 +14,25 @@ fn spiral_coord_from_index(index: u64) -> Cell {
     // centered around the cell #1 containing the index:
     let square_length = {
         let mut side = 1;
-        while index > side*side {side += 2;}
+        while index > side * side {
+            side += 2;
+        }
         side - 1 // side elements => length side-1
     };
-    
+
     if square_length < 2 {
         // Center of the spiral
-        return Cell {x: 0, y: 0};
+        return Cell { x: 0, y: 0 };
     }
 
-    let half_length = (square_length/2) as i64;
+    let half_length = (square_length / 2) as i64;
     if (square_length + 1) * (square_length + 1) == index {
         // Bottom-right corner
-        return Cell {x: half_length, y: -half_length};
-    } 
+        return Cell {
+            x: half_length,
+            y: -half_length,
+        };
+    }
 
     // We find on which side of the square the cell is,
     // running counter-clockwise from the bottom-right corner.
@@ -39,14 +44,14 @@ fn spiral_coord_from_index(index: u64) -> Cell {
         1 => (half_length - rem, half_length),
         2 => (-half_length, half_length - rem),
         3 => (rem - half_length, -half_length),
-        _ => unreachable!()
+        _ => unreachable!(),
     };
-    Cell {x, y}
+    Cell { x, y }
 }
 
 /// Finds the distance from the center of the spiral
 /// to the provided index.
-/// 
+///
 /// # Examples
 /// ```
 /// use advent_of_code::day3::one;
@@ -66,7 +71,8 @@ fn neighbors(c1: &Cell, c2: &Cell) -> bool {
 }
 
 fn sum_neighbors(target: &Cell, cells: &HashMap<Cell, u64>) -> u64 {
-    cells.iter()
+    cells
+        .iter()
         .filter(|&(c, _)| neighbors(target, c))
         .map(|(_, val)| val)
         .sum()
@@ -74,7 +80,7 @@ fn sum_neighbors(target: &Cell, cells: &HashMap<Cell, u64>) -> u64 {
 
 /// Finds the first element of the "cumulative" spiral
 /// which is larger than the provided value
-/// 
+///
 /// # Examples
 /// ```
 /// use advent_of_code::day3::two;
@@ -90,7 +96,7 @@ pub fn two(s: &str) -> String {
 
     let mut index = 1;
     let mut val = 1;
-    cells.insert(Cell {x: 0, y: 0}, val);
+    cells.insert(Cell { x: 0, y: 0 }, val);
 
     while val < objective {
         index += 1;

@@ -7,18 +7,14 @@ enum Direction {
     NW,
     SW,
     S,
-    SE
+    SE,
 }
 
 impl Direction {
     /// Creates a direction from an integer
     /// (From NE, counterclockwise, cyclic)
     fn dir(x: isize) -> Direction {
-        let i = if x >= 0 {
-            x % 6
-        } else {
-            x % 6 + 6
-        };
+        let i = if x >= 0 { x % 6 } else { x % 6 + 6 };
         match i {
             0 => NE,
             1 => N,
@@ -26,7 +22,7 @@ impl Direction {
             3 => SW,
             4 => S,
             5 => SE,
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 
@@ -39,7 +35,7 @@ impl Direction {
             NW => 2,
             SW => 3,
             S => 4,
-            SE => 5
+            SE => 5,
         }
     }
 
@@ -77,20 +73,20 @@ impl Direction {
 
 /// Stores a simplified path, with three axis coordinates
 struct Path {
-    path: [isize; 3]
+    path: [isize; 3],
 }
 
 impl Path {
     /// New path, at initial hex
     fn new() -> Self {
-        Path {path: [0; 3]}
+        Path { path: [0; 3] }
     }
 
     /// Number of steps to take in the given direction
     fn get(&self, dir: &Direction) -> usize {
         let result = match dir.val() % 6 {
             x if x < 3 => self.path[x],
-            x => - self.path[x-3]
+            x => -self.path[x - 3],
         };
         result.max(0) as usize
     }
@@ -98,8 +94,12 @@ impl Path {
     /// Execute a number of steps
     fn steps(&mut self, dir: &Direction, n: isize) {
         match dir.val() % 6 {
-            x if x < 3 => {self.path[x] += n;},
-            x => {self.path[x-3] -= n;}
+            x if x < 3 => {
+                self.path[x] += n;
+            }
+            x => {
+                self.path[x - 3] -= n;
+            }
         };
     }
 
@@ -162,7 +162,7 @@ fn parse_dir(s: &str) -> Direction {
         "sw" => SW,
         "s" => S,
         "se" => SE,
-        _ => {panic!("Unable to parse direction: '{}'", s)}
+        _ => panic!("Unable to parse direction: '{}'", s),
     }
 }
 
@@ -177,7 +177,7 @@ fn parse_path(s: &str) -> Vec<Direction> {
 
 /// Finds the minimal number of steps to reach a child
 /// that took the provided path.
-/// 
+///
 /// # Examples
 /// ```
 /// use advent_of_code::day11::one;
@@ -185,14 +185,17 @@ fn parse_path(s: &str) -> Vec<Direction> {
 /// assert_eq!("0", one("ne,ne,sw,sw"));
 /// assert_eq!("2", one("ne,ne,s,s"));
 /// assert_eq!("3", one("se,sw,se,sw,sw"));
-/// ``` 
+/// ```
 pub fn one(s: &str) -> String {
-    let mut path = parse_path(s).iter().fold(Path::new(), |mut path, dir| {path.step(dir); path});
+    let mut path = parse_path(s).iter().fold(Path::new(), |mut path, dir| {
+        path.step(dir);
+        path
+    });
     path.shortest_dist().to_string()
 }
 
 /// Finds the maximal distance at which the child ever was.
-/// 
+///
 /// # Examples
 /// ```
 /// use advent_of_code::day11::two;

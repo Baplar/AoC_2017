@@ -1,12 +1,12 @@
 /// Parses a single line describing a scanner
 fn parse_scanner(s: &str) -> Result<(usize, usize), String> {
     let mut it = s.trim().split(": ");
-    let depth = it
-        .next().ok_or("Missing depth")?
-        .parse().map_err(|e| format!("Could not parse depth as int: {}", e))?;
-    let range = it
-        .next().ok_or("Missing range")?
-        .parse().map_err(|e| format!("Could not parse range as int: {}", e))?;
+    let depth = it.next().ok_or("Missing depth")?.parse().map_err(|e| {
+        format!("Could not parse depth as int: {}", e)
+    })?;
+    let range = it.next().ok_or("Missing range")?.parse().map_err(|e| {
+        format!("Could not parse range as int: {}", e)
+    })?;
     Ok((depth, range))
 }
 
@@ -21,7 +21,7 @@ fn parse_scanners(s: &str) -> Vec<(usize, usize)> {
 
 /// Calculates the penalty at the depth
 /// if the packet leaves at t=offset
-/// 
+///
 /// # Examples
 /// ```
 /// use advent_of_code::day13::penalty;
@@ -37,7 +37,7 @@ pub fn penalty(depth: usize, range: usize, offset: usize) -> bool {
 
 /// Calculates the severity of a trip through the firewall
 /// when leaving at t=0
-/// 
+///
 /// # Examples
 /// ```
 /// use advent_of_code::day13::one;
@@ -52,18 +52,18 @@ pub fn one(s: &str) -> String {
     let result: usize = parse_scanners(s)
         .iter()
         .filter(|&&(d, r)| penalty(d, r, 0))
-        .map(|&(d, r)| d*r)
+        .map(|&(d, r)| d * r)
         .sum();
     result.to_string()
 }
 
 /// Finds the lowest number of picoseconds to wait
 /// before leaving in order not to be caught.
-/// 
+///
 /// # Warning
 /// For now, the algorithm uses brute force.
 /// This can take a long time for large inputs.
-/// 
+///
 /// # Examples
 /// ```
 /// use advent_of_code::day13::two;
@@ -77,9 +77,10 @@ pub fn one(s: &str) -> String {
 pub fn two(s: &str) -> String {
     let scanners = parse_scanners(s);
     (0..)
-        .filter(|&offset|
-            scanners.iter()
-            .all(|&(d, r)| !penalty(d, r, offset)))
-        .next().unwrap_or(0)
+        .filter(|&offset| {
+            scanners.iter().all(|&(d, r)| !penalty(d, r, offset))
+        })
+        .next()
+        .unwrap_or(0)
         .to_string()
 }

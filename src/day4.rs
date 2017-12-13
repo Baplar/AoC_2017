@@ -1,5 +1,5 @@
 /// Checks the validity of a passphrase
-/// 
+///
 /// # Examples
 /// ```
 /// use advent_of_code::day4::valid;
@@ -25,7 +25,7 @@ pub fn one(s: &str) -> String {
 }
 
 /// Checks the validity of a passphrase forbidding anagrams
-/// 
+///
 /// # Examples
 /// ```
 /// use advent_of_code::day4::valid_anagram;
@@ -36,18 +36,18 @@ pub fn one(s: &str) -> String {
 /// assert!(!valid_anagram("oiii ioii iioi iiio"));
 /// ```
 pub fn valid_anagram(s: &str) -> bool {
-    let mut words: Vec<String> = s
-        .split_whitespace()
+    let mut words: Vec<String> = s.split_whitespace()
         .map(|w| {
             let mut chars: Vec<char> = w.chars().collect();
             chars.sort();
-            chars.iter().collect()})
+            chars.iter().collect()
+        })
         .collect();
     let nb_words = words.len();
     if nb_words == 0 {
         return false;
     }
-    
+
     words.sort();
     words.dedup();
     let nb_unique = words.len();
@@ -57,5 +57,8 @@ pub fn valid_anagram(s: &str) -> bool {
 /// Counts the number of valid passphrases in the input,
 /// banning anagrams
 pub fn two(s: &str) -> String {
-    s.split("\n").filter(|&s| valid_anagram(s)).count().to_string()
+    s.split("\n")
+        .filter(|&s| valid_anagram(s))
+        .count()
+        .to_string()
 }

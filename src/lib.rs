@@ -16,9 +16,8 @@ use std::fs::File;
 use std::io::Read;
 extern crate regex;
 
-/// Get the solver function correpsonding to the day and part 
-pub fn get_solver(day: u32, part: u32) -> Option<fn(&str) -> String>
-{
+/// Get the solver function correpsonding to the day and part
+pub fn get_solver(day: u32, part: u32) -> Option<fn(&str) -> String> {
     match (day, part) {
         (1, 1) => Some(day1::one),
         (1, 2) => Some(day1::two),
@@ -46,11 +45,11 @@ pub fn get_solver(day: u32, part: u32) -> Option<fn(&str) -> String>
         (12, 2) => Some(day12::two),
         (13, 1) => Some(day13::one),
         (13, 2) => Some(day13::two),
-        _ => None
+        _ => None,
     }
 }
 
-/// Read the content of the file 
+/// Read the content of the file
 pub fn get_input(filename: &str) -> Result<String, std::io::Error> {
     let mut contents = String::new();
     let mut f = File::open(filename)?;

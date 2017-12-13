@@ -8,7 +8,7 @@ pub fn new_list() -> Vec<u8> {
 }
 
 /// Ties a knot in the list
-/// 
+///
 /// # Examples
 /// ```
 /// use advent_of_code::day10::{new_list, knot};
@@ -17,8 +17,8 @@ pub fn new_list() -> Vec<u8> {
 /// let slice = [19, 18, 17, 16, 15, 14, 13, 12, 11, 10];
 /// assert_eq!(list[10..20], slice);
 /// ```
-pub fn knot(list: &mut Vec<u8>, position: usize, length: usize) {    
-    for i in 0..length/2 {
+pub fn knot(list: &mut Vec<u8>, position: usize, length: usize) {
+    for i in 0..length / 2 {
         let n1 = (position + i) % list.len();
         let n2 = (position + length - 1 - i) % list.len();
         list.swap(n1, n2);
@@ -26,7 +26,7 @@ pub fn knot(list: &mut Vec<u8>, position: usize, length: usize) {
 }
 
 /// Creates a new list and hashes it with the provided lengths
-/// 
+///
 /// # Examples
 /// ```
 /// use advent_of_code::day10::hash;
@@ -49,7 +49,7 @@ pub fn hash(lengths: &Vec<usize>) -> (Vec<u8>, usize, usize) {
 }
 
 /// Parses a list of lengths
-/// 
+///
 /// # Examples
 /// ```
 /// use advent_of_code::day10::parse_lengths;
@@ -73,7 +73,7 @@ pub fn one(s: &str) -> String {
 }
 
 /// Parses a list of ascii characters into lengths
-/// 
+///
 /// # Examples
 /// ```
 /// use advent_of_code::day10::parse_ascii;
@@ -82,11 +82,7 @@ pub fn one(s: &str) -> String {
 /// assert_eq!(v, parse_ascii(s));
 /// ```
 pub fn parse_ascii(s: &str) -> Vec<usize> {
-    s.trim()
-        .as_bytes()
-        .iter()
-        .map(|&l| l as usize)
-        .collect()
+    s.trim().as_bytes().iter().map(|&l| l as usize).collect()
 }
 
 /// A hasher structure that keeps an internal state
@@ -95,7 +91,7 @@ pub struct Hasher {
     list: Vec<u8>,
     position: usize,
     skip: usize,
-    lengths: Vec<usize>
+    lengths: Vec<usize>,
 }
 
 impl Hasher {
@@ -110,7 +106,7 @@ impl Hasher {
 }
 
 /// Takes a sparse hash and turns it into a dense hash
-/// 
+///
 /// # Examples
 /// ```
 /// use advent_of_code::day10::densify;
@@ -139,7 +135,7 @@ pub fn densify(sparse: Vec<u8>) -> Vec<u8> {
 }
 
 /// Implements the complete hashing algorithm
-/// 
+///
 /// # Examples
 /// ```
 /// use advent_of_code::day10::two;
@@ -152,11 +148,19 @@ pub fn two(s: &str) -> String {
     let mut lengths = parse_ascii(s);
     lengths.append(&mut vec![17, 31, 73, 47, 23]);
 
-    let mut hasher = Hasher{list: new_list(), position: 0, skip: 0, lengths};
+    let mut hasher = Hasher {
+        list: new_list(),
+        position: 0,
+        skip: 0,
+        lengths,
+    };
     for _ in 0..64 {
         hasher.hash();
     }
     let dense = densify(hasher.list);
 
-    dense.iter().fold(String::new(), |s, u| s + &format!("{:02x}", u))
+    dense.iter().fold(
+        String::new(),
+        |s, u| s + &format!("{:02x}", u),
+    )
 }

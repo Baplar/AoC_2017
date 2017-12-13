@@ -4,8 +4,8 @@ use self::Cmp::*;
 
 /// The arithmetic operator to apply to the target register
 enum Op {
-    INC,    // Increment
-    DEC     // Decrement
+    INC, // Increment
+    DEC, // Decrement
 }
 
 /// The comparison operator to use on the compared register
@@ -25,7 +25,7 @@ pub struct Instruction {
     val: isize,
     compared: String,
     cmp: Cmp,
-    cond: isize
+    cond: isize,
 }
 
 /// Parses a complete block of instruction
@@ -51,11 +51,14 @@ pub fn parse_instruction(s: &str) -> Result<Instruction, String> {
     let op = match tokens.next().ok_or("Missing operation")? {
         "inc" => INC,
         "dec" => DEC,
-        x => Err(format!("Unknown operation {}", x))?
+        x => Err(format!("Unknown operation {}", x))?,
     };
-    
-    let val = tokens.next().ok_or("Missing operation value")?
-        .parse().map_err(|e| format!("Could not parse value as int: {}", e))?;
+
+    let val = tokens
+        .next()
+        .ok_or("Missing operation value")?
+        .parse()
+        .map_err(|e| format!("Could not parse value as int: {}", e))?;
 
     // "if"
     tokens.next().ok_or("Missing if statement")?;
@@ -69,13 +72,23 @@ pub fn parse_instruction(s: &str) -> Result<Instruction, String> {
         "<=" => LE,
         ">" => GT,
         ">=" => GE,
-        x => Err(format!("Unknown comparator {}", x))?
+        x => Err(format!("Unknown comparator {}", x))?,
     };
 
-    let cond = tokens.next().ok_or("Missing condition")?
-        .parse().map_err(|e| format!("Could not parse condition as int: {}", e))?;
+    let cond = tokens.next().ok_or("Missing condition")?.parse().map_err(
+        |e| {
+            format!("Could not parse condition as int: {}", e)
+        },
+    )?;
 
-    Ok(Instruction {target, op, val, compared, cmp, cond})
+    Ok(Instruction {
+        target,
+        op,
+        val,
+        compared,
+        cmp,
+        cond,
+    })
 }
 
 /// The register bank
@@ -83,7 +96,7 @@ pub type Registers = HashMap<String, isize>;
 
 /// Evaluates the instruction on place
 /// on the provided mutable register bank
-/// 
+///
 /// # Examples
 /// ```
 /// use advent_of_code::day8::{Registers, parse, eval, max};
@@ -95,19 +108,19 @@ pub type Registers = HashMap<String, isize>;
 /// let v = parse(input);
 /// let mut regs = Registers::new();
 /// assert_eq!(0, max(&regs));
-/// 
+///
 /// eval(&v[0], &mut regs);
 /// assert_eq!(0, max(&regs));
-/// 
+///
 /// eval(&v[1], &mut regs);
 /// assert_eq!(1, regs["a"]);
-/// 
+///
 /// eval(&v[2], &mut regs);
 /// assert_eq!(10, regs["c"]);
-/// 
+///
 /// eval(&v[3], &mut regs);
 /// assert_eq!(-10, regs["c"]);
-/// 
+///
 /// assert_eq!(1, max(&regs));
 /// ```
 pub fn eval(i: &Instruction, regs: &mut Registers) {
@@ -167,6 +180,6 @@ pub fn two(s: &str) -> String {
             m = new_m;
         }
     }
-    
+
     m.to_string()
 }

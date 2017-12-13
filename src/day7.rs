@@ -13,7 +13,12 @@ pub struct Program {
 impl Program {
     /// Creates a program without info on its children
     fn new(name: &str, weight: usize) -> Program {
-        Program {name: String::from(name), weight, children: vec![], cumulated_weight: 0}
+        Program {
+            name: String::from(name),
+            weight,
+            children: vec![],
+            cumulated_weight: 0,
+        }
     }
 }
 
@@ -37,29 +42,34 @@ fn set_children(name: &str, map_programs: &mut ParserMap) -> Result<Program, Str
 /// Creates a hash-map describing each node of the tree,
 /// then returns its root.
 fn parse_tower(s: &str) -> Result<Program, String> {
-    let re = Regex::new(r"(?P<name>\w+) \((?P<weight>\d+)\)(?: -> (?P<children>.*))?")
-        .map_err(|e| format!("{}", e))?;
+    let re = Regex::new(
+        r"(?P<name>\w+) \((?P<weight>\d+)\)(?: -> (?P<children>.*))?",
+    ).map_err(|e| format!("{}", e))?;
 
-    let mut map_programs: ParserMap = s.trim().split("\n")
+    let mut map_programs: ParserMap = s.trim()
+        .split("\n")
         .filter_map(|p| re.captures(p.trim()))
         .filter_map(|caps| {
-            let name =  caps.name("name")?.as_str();
+            let name = caps.name("name")?.as_str();
             let weight = caps.name("weight")?.as_str().parse().ok()?;
             let children = match caps.name("children") {
-                Some(children) => children.as_str().split(", ").map(|c| c.to_string()).collect(),
-                None => vec![]
+                Some(children) => {
+                    children
+                        .as_str()
+                        .split(", ")
+                        .map(|c| c.to_string())
+                        .collect()
+                }
+                None => vec![],
             };
-            Some((name.to_string(), (Program::new(&name, weight), children)))})
+            Some((name.to_string(), (Program::new(&name, weight), children)))
+        })
         .collect();
 
-    let all_names: HashSet<String> = map_programs
-        .keys()
-        .map(|k| k.clone())
-        .collect();
-    let with_children = map_programs
+    let all_names: HashSet<String> = map_programs.keys().map(|k| k.clone()).collect();
+    let with_children: HashSet<String> = map_programs
         .values()
-        .flat_map(|&(_, ref children)| children)
-        .map(|k| k.clone())
+        .flat_map(|&(_, ref children)| children.clone())
         .collect();
     let without_children: Vec<String> = all_names
         .difference(&with_children)
@@ -75,7 +85,7 @@ fn parse_tower(s: &str) -> Result<Program, String> {
 }
 
 /// Returns the root of the program tower
-/// 
+///
 ///  # Examples
 /// ```
 /// use advent_of_code::day7::one;
@@ -98,12 +108,12 @@ fn parse_tower(s: &str) -> Result<Program, String> {
 pub fn one(s: &str) -> String {
     match parse_tower(s) {
         Ok(p) => p.name.to_string(),
-        Err(e) => format!("Parsing error: {}", e)
+        Err(e) => format!("Parsing error: {}", e),
     }
 }
 
 /// Recursively goes down the subtree and finds
-/// the program responsible for the unbalance 
+/// the program responsible for the unbalance
 fn find_unbalanced(program: &Program) -> Option<(&Program, usize)> {
     if program.children.len() == 0 {
         // No children
@@ -121,13 +131,10 @@ fn find_unbalanced(program: &Program) -> Option<(&Program, usize)> {
     }
 
 
-    let (current_weight, culprit) = match children_weights
-        .iter()
-        .find(|&(_, v)| v.len() == 1)
-        {
-            Some((w, v)) => (w, v[0]),
-            None => None?
-        };
+    let (current_weight, culprit) = match children_weights.iter().find(|&(_, v)| v.len() == 1) {
+        Some((w, v)) => (w, v[0]),
+        None => None?,
+    };
     let (desired_weight, _) = children_weights.iter().find(|&(_, v)| v.len() > 1)?;
     let new_weight = culprit.weight + desired_weight - current_weight;
 
@@ -136,7 +143,7 @@ fn find_unbalanced(program: &Program) -> Option<(&Program, usize)> {
 
 /// Calculates the new weight to give
 /// to the unbalanced program of the tower
-/// 
+///
 /// # Examples
 /// ```
 /// use advent_of_code::day7::two;
@@ -159,7 +166,9 @@ fn find_unbalanced(program: &Program) -> Option<(&Program, usize)> {
 pub fn two(s: &str) -> String {
     let root = match parse_tower(s) {
         Ok(p) => p,
-        Err(e) => {return e.to_string();}
+        Err(e) => {
+            return e.to_string();
+        }
     };
 
     if let Some((_, new_weight)) = find_unbalanced(&root) {

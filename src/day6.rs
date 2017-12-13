@@ -1,15 +1,19 @@
 #[derive(PartialEq, Clone)]
 pub struct MemoryBank {
-    pub bank: Vec<usize>
+    pub bank: Vec<usize>,
 }
 
 impl MemoryBank {
     pub fn new(s: &str) -> Self {
-        Self {bank: s.split_whitespace().filter_map(|w| w.parse().ok()).collect()}
+        Self {
+            bank: s.split_whitespace()
+                .filter_map(|w| w.parse().ok())
+                .collect(),
+        }
     }
 
     /// Redistributes the blocks of the bank with the most blocks
-    /// 
+    ///
     /// # Examples
     /// ```
     /// use advent_of_code::day6::MemoryBank;
@@ -27,9 +31,12 @@ impl MemoryBank {
     /// ```
     pub fn redistribute(&self) -> Self {
         let n = self.bank.len();
-        let (i_max, max) = self.bank.
-            iter().enumerate()
-            .fold((0,0), |(i_max, max), (i, &val)| if val > max {(i, val)} else {(i_max, max)});
+        let (i_max, max) = self.bank.iter().enumerate().fold((0, 0), |(i_max, max),
+         (i, &val)| if val > max {
+            (i, val)
+        } else {
+            (i_max, max)
+        });
         let q = max / n;
         let r = max % n;
         let mut new_bank = self.clone();
@@ -39,13 +46,13 @@ impl MemoryBank {
             if (n + i - (i_max + 1)) % n < r {
                 new_bank.bank[i] += 1;
             }
-        };
+        }
         new_bank
     }
 }
 
 /// Finds the number of iterations before looping
-/// 
+///
 /// # Examples
 /// ```
 /// use advent_of_code::day6::one;
@@ -63,12 +70,12 @@ pub fn one(s: &str) -> String {
         all_banks.push(bank);
         bank = new_bank;
         i += 1;
-    };
+    }
     i.to_string()
 }
 
 /// Finds the number of cycles in the infinite loop
-/// 
+///
 /// # Examples
 /// ```
 /// use advent_of_code::day6::two;

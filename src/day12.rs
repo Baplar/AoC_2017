@@ -3,25 +3,24 @@ use std::collections::HashMap;
 use regex::{Regex, Error};
 
 struct Parser {
-    re: Regex
+    re: Regex,
 }
 
 impl Parser {
     fn new() -> Result<Self, Error> {
         let re = Regex::new(r"(\d+) <-> (\d+(?:, \d+)*)")?;
-        Ok(Parser {re})
+        Ok(Parser { re })
     }
 
     /// Parses a pipe definition string
     fn parse_pipe(&self, s: &str) -> Result<(usize, HashSet<usize>), String> {
         let caps = self.re.captures(s.trim()).ok_or("Not a pipe definition")?;
 
-        let first: usize = caps[1].parse().map_err(|e| format!("Could not parse first: {}", e))?;
+        let first: usize = caps[1].parse().map_err(
+            |e| format!("Could not parse first: {}", e),
+        )?;
 
-        let neighbors = caps[2]
-            .split(", ")
-            .filter_map(|n| n.parse().ok())
-            .collect();
+        let neighbors = caps[2].split(", ").filter_map(|n| n.parse().ok()).collect();
 
         Ok((first, neighbors))
     }
@@ -32,7 +31,7 @@ impl Parser {
         let v = s.trim()
             .split("\n")
             .filter_map(|s| self.parse_pipe(s.trim()).ok())
-            .collect();    
+            .collect();
         v
     }
 }
@@ -46,17 +45,19 @@ fn reduce_group(pipes: &HashMap<usize, HashSet<usize>>, root: usize) -> HashSet<
     while old.len() > 0 {
         group = group.union(&old).map(|&x| x).collect();
         old = old.iter()
-            .fold(HashSet::new(), |new, x| new.union(&pipes[x]).map(|&x| x).collect())
+            .fold(HashSet::new(), |new, x| {
+                new.union(&pipes[x]).map(|&x| x).collect()
+            })
             .difference(&group)
             .map(|&x| x)
             .collect();
     }
-    ;group
+    group
 }
 
 /// Calculates the number of nodes connected to 0
 /// in the provided list of pipes
-/// 
+///
 /// # Examples
 /// ```
 /// use advent_of_code::day12::one;
@@ -79,7 +80,7 @@ pub fn one(s: &str) -> String {
 
 /// Calculates the number of interconnected groups
 /// in the provided list of pipes
-/// 
+///
 /// # Examples
 /// ```
 /// use advent_of_code::day12::two;

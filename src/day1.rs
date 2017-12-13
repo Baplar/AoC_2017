@@ -1,5 +1,5 @@
 /// Computes the "captcha sum" of a string representing a sequence of digits.
-/// 
+///
 /// # Examples
 /// ```
 /// use advent_of_code::day1::one;
@@ -14,17 +14,21 @@ pub fn one(s: &str) -> String {
     let n = coll.len();
 
     // We create a first iterator on the collection
-    let first = coll.clone().into_iter();
+    let first = coll.iter();
     // Then a second iterator which skips the first character and puts it at the end
-    let second = coll.into_iter().cycle().skip(1).take(n);
+    let second = coll.iter().cycle().skip(1).take(n);
 
     // We take the sum of the "duplicated" characters
-    let result: u32 = first.zip(second).filter(|&(x, y)| x == y).map(|(x, _)| x).sum();
+    let result: u32 = first
+        .zip(second)
+        .filter(|&(&x, &y)| x == y)
+        .map(|(&x, _)| x)
+        .sum();
     result.to_string()
 }
 
 /// Same thing, but according to the second algorithm
-/// 
+///
 /// # Examples
 /// ```
 /// use advent_of_code::day1::two;
@@ -42,9 +46,13 @@ pub fn two(s: &str) -> String {
     // We create a first iterator on the collection
     let first = coll.iter();
     // Then a second iterator which skips the first character and puts it at the end
-    let second = coll.iter().cycle().skip(n/2).take(n);
+    let second = coll.iter().cycle().skip(n / 2).take(n);
 
     // We take the sum of the "duplicated" characters
-    let result: u32 = first.zip(second).filter(|&(x, y)| x == y).map(|(x, _)| x).sum();
+    let result: u32 = first
+        .zip(second)
+        .filter(|&(&x, &y)| x == y)
+        .map(|(&x, _)| x)
+        .sum();
     result.to_string()
 }
