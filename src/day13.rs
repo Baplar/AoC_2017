@@ -49,12 +49,12 @@ pub fn penalty(depth: usize, range: usize, offset: usize) -> bool {
 /// assert_eq!("24", one(s));
 /// ```
 pub fn one(s: &str) -> String {
-    let result: usize = parse_scanners(s)
+    let severity: usize = parse_scanners(s)
         .into_iter()
         .filter(|&(d, r)| penalty(d, r, 0))
         .map(|(d, r)| d * r)
         .sum();
-    result.to_string()
+    severity.to_string()
 }
 
 /// Finds the lowest number of picoseconds to wait

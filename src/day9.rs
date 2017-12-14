@@ -2,7 +2,7 @@ use std::str::Chars;
 
 /// Parses the content of a well-formed croup,
 /// and returns the corresponding group score
-pub fn parse_group_score(stream: &mut Chars, level: usize) -> usize {
+fn parse_group_score(stream: &mut Chars, level: usize) -> usize {
     let mut score = level;
     while let Some(c) = stream.next() {
         match c {
@@ -26,7 +26,7 @@ pub fn parse_group_score(stream: &mut Chars, level: usize) -> usize {
 
 /// Parses the content of a garbage block,
 /// and returns the number of unescaped characters
-pub fn parse_group_garbage(stream: &mut Chars) -> usize {
+fn parse_group_garbage(stream: &mut Chars) -> usize {
     let mut score = 0;
     while let Some(c) = stream.next() {
         match c {
@@ -50,7 +50,7 @@ pub fn parse_group_garbage(stream: &mut Chars) -> usize {
 
 /// Parses the content of a well-formed croup,
 /// and returns the number of unescaped characters in its garbage
-pub fn score_garbage(stream: &mut Chars) -> usize {
+fn score_garbage(stream: &mut Chars) -> usize {
     let mut score = 0;
     while let Some(c) = stream.next() {
         match c {

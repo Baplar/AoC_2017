@@ -29,14 +29,14 @@ pub fn knot(list: &mut Vec<u8>, position: usize, length: usize) {
 ///
 /// # Examples
 /// ```
-/// use advent_of_code::day10::hash;
-/// let (list, last_pos, last_skip) = hash(&vec![3, 3, 3]);
+/// use advent_of_code::day10::hash_round;
+/// let (list, last_pos, last_skip) = hash_round(&vec![3, 3, 3]);
 /// let slice = [2, 1, 0, 5, 4, 3, 6, 9, 8, 7];
 /// assert_eq!(list[0..10], slice);
 /// assert_eq!(12, last_pos);
 /// assert_eq!(3, last_skip);
 /// ```
-pub fn hash(lengths: &Vec<usize>) -> (Vec<u8>, usize, usize) {
+pub fn hash_round(lengths: &Vec<usize>) -> (Vec<u8>, usize, usize) {
     let mut list = new_list();
     let mut position = 0;
     let mut skip = 0;
@@ -68,7 +68,7 @@ pub fn parse_lengths(s: &str) -> Vec<usize> {
 /// of the hash generated with the provided lengths
 pub fn one(s: &str) -> String {
     let lengths = parse_lengths(s);
-    let (list, _, _) = hash(&lengths);
+    let (list, _, _) = hash_round(&lengths);
     (list[0] * list[1]).to_string()
 }
 
@@ -82,7 +82,11 @@ pub fn one(s: &str) -> String {
 /// assert_eq!(v, parse_ascii(s));
 /// ```
 pub fn parse_ascii(s: &str) -> Vec<usize> {
-    s.trim().as_bytes().iter().map(|&l| l as usize).collect()
+    s.trim()
+        .as_bytes()
+        .into_iter()
+        .map(|&l| l as usize)
+        .collect()
 }
 
 /// A hasher structure that keeps an internal state
@@ -96,7 +100,7 @@ pub struct Hasher {
 
 impl Hasher {
     /// Passes a round of hashing on its internal state
-    pub fn hash(&mut self) {
+    pub fn hash_round(&mut self) {
         for &length in self.lengths.iter() {
             knot(&mut self.list, self.position, length);
             self.position = (self.position + length + self.skip) % self.list.len();
@@ -114,11 +118,11 @@ impl Hasher {
 /// assert_eq!(vec![64], densify(sparse));
 /// ```
 pub fn densify(sparse: Vec<u8>) -> Vec<u8> {
-    let mut it = sparse.iter();
+    let mut it = sparse.into_iter();
     let mut dense_hash = vec![];
     let mut group = 0;
     let mut group_size = 0;
-    while let Some(&x) = it.next() {
+    while let Some(x) = it.next() {
         group ^= x;
         group_size += 1;
         if group_size == 16 {
@@ -135,16 +139,7 @@ pub fn densify(sparse: Vec<u8>) -> Vec<u8> {
 }
 
 /// Implements the complete hashing algorithm
-///
-/// # Examples
-/// ```
-/// use advent_of_code::day10::two;
-/// assert_eq!(two(""), "a2582a3a0e66e6e86e3812dcb672a272");
-/// assert_eq!(two("AoC 2017"), "33efeb34ea91902bb2f59c9920caa6cd");
-/// assert_eq!(two("1,2,3"), "3efbe78a8d82f29979031a4aa0b16a9d");
-/// assert_eq!(two("1,2,4"), "63960835bcdc130f0b66d7ff4f6a5a8e");
-/// ```
-pub fn two(s: &str) -> String {
+pub fn knot_hash(s: &str) -> Vec<u8> {
     let mut lengths = parse_ascii(s);
     lengths.append(&mut vec![17, 31, 73, 47, 23]);
 
@@ -155,12 +150,24 @@ pub fn two(s: &str) -> String {
         lengths,
     };
     for _ in 0..64 {
-        hasher.hash();
+        hasher.hash_round();
     }
-    let dense = densify(hasher.list);
 
-    dense.iter().fold(
-        String::new(),
-        |s, u| s + &format!("{:02x}", u),
-    )
+    densify(hasher.list)
+}
+
+/// Implements the complete hashing algorithm
+///
+/// # Examples
+/// ```
+/// use advent_of_code::day10::two;
+/// assert_eq!(two(""), "a2582a3a0e66e6e86e3812dcb672a272");
+/// assert_eq!(two("AoC 2017"), "33efeb34ea91902bb2f59c9920caa6cd");
+/// assert_eq!(two("1,2,3"), "3efbe78a8d82f29979031a4aa0b16a9d");
+/// assert_eq!(two("1,2,4"), "63960835bcdc130f0b66d7ff4f6a5a8e");
+/// ```
+pub fn two(s: &str) -> String {
+    knot_hash(s).into_iter().fold(String::new(), |s, u| {
+        s + &format!("{:02x}", u)
+    })
 }

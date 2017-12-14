@@ -25,10 +25,16 @@ pub fn one(s: &str) -> String {
 }
 
 /// Sorts the characters of a word
+///
+/// # Examples
+/// ```
+/// use advent_of_code::day4::sort_word;
+/// assert_eq!("ceelmow", sort_word("welcome"));
+/// ```
 pub fn sort_word(w: &str) -> String {
     let mut chars: Vec<char> = w.chars().collect();
     chars.sort();
-    chars.iter().collect()
+    chars.into_iter().collect()
 }
 
 /// Checks the validity of a passphrase forbidding anagrams
@@ -43,9 +49,7 @@ pub fn sort_word(w: &str) -> String {
 /// assert!(!valid_anagram("oiii ioii iioi iiio"));
 /// ```
 pub fn valid_anagram(s: &str) -> bool {
-    let mut words: Vec<String> = s.split_whitespace()
-        .map(sort_word)
-        .collect();
+    let mut words: Vec<String> = s.split_whitespace().map(sort_word).collect();
     let nb_words = words.len();
     if nb_words == 0 {
         return false;

@@ -11,6 +11,7 @@ pub mod day10;
 pub mod day11;
 pub mod day12;
 pub mod day13;
+pub mod day14;
 
 use std::fs::File;
 use std::io::Read;
@@ -45,6 +46,8 @@ pub fn get_solver(day: u32, part: u32) -> Option<fn(&str) -> String> {
         (12, 2) => Some(day12::two),
         (13, 1) => Some(day13::one),
         (13, 2) => Some(day13::two),
+        (14, 1) => Some(day14::one),
+        (14, 2) => Some(day14::two),
         _ => None,
     }
 }

@@ -125,10 +125,7 @@ impl Path {
 
     /// Distance of the complete path
     fn dist(&self) -> usize {
-        (0..6)
-            .map(Direction::dir)
-            .map(|dir| self.get(&dir))
-            .sum()
+        (0..6).map(Direction::dir).map(|dir| self.get(&dir)).sum()
     }
 
     /// Shortest distance to get to the end point of the path
@@ -168,10 +165,7 @@ fn parse_dir(s: &str) -> Direction {
 
 /// Parses a list of directions
 fn parse_path(s: &str) -> Vec<Direction> {
-    s.trim()
-        .split(",")
-        .map(|s| parse_dir(s.trim()))
-        .collect()
+    s.trim().split(",").map(|s| parse_dir(s.trim())).collect()
 }
 
 /// Finds the minimal number of steps to reach a child
@@ -186,10 +180,13 @@ fn parse_path(s: &str) -> Vec<Direction> {
 /// assert_eq!("3", one("se,sw,se,sw,sw"));
 /// ```
 pub fn one(s: &str) -> String {
-    let mut path = parse_path(s).iter().fold(Path::new(), |mut path, dir| {
-        path.step(dir);
-        path
-    });
+    let mut path = parse_path(s).into_iter().fold(
+        Path::new(),
+        |mut path, ref dir| {
+            path.step(dir);
+            path
+        },
+    );
     path.shortest_dist().to_string()
 }
 
@@ -207,8 +204,8 @@ pub fn two(s: &str) -> String {
     let dirs = parse_path(s);
     let mut path = Path::new();
     let mut max_dist = 0;
-    for dir in dirs.iter() {
-        path.short_step(dir);
+    for dir in dirs.into_iter() {
+        path.short_step(&dir);
         max_dist = max_dist.max(path.dist());
     }
     max_dist.to_string()

@@ -39,6 +39,7 @@ fn set_children(name: &str, map_programs: &mut ParserMap) -> Result<Program, Str
     Ok(p)
 }
 
+/// Extracts a program description from regex captures
 fn extract_regex(caps: Captures) -> Option<(String, (Program, Vec<String>))> {
     let name = caps.name("name")?.as_str();
     let weight = caps.name("weight")?.as_str().parse().ok()?;
