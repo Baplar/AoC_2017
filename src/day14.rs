@@ -35,9 +35,7 @@ pub fn grid(key: &str) -> HashSet<(u8, u8)> {
         .map(|j| (j as u8, format!("{}-{}", key, j)))
         .map(|(j, s)| (j, knot_hash(s.as_str())))
         .map(|(j, h)| (j, to_row(h)))
-        .flat_map(|(j, r)| {
-            r.into_iter().map(|i| (i, j)).collect::<Vec<(u8, u8)>>()
-        })
+        .flat_map(|(j, r)| r.into_iter().map(move |i| (i, j)))
         .collect()
 }
 
@@ -71,13 +69,13 @@ fn reduce_group(root: (u8, u8), grid: &HashSet<(u8, u8)>) -> HashSet<(u8, u8)> {
     let mut old = HashSet::new();
     old.insert(root);
     while !old.is_empty() {
-        group = group.union(&old).map(|&x| x).collect();
+        group = group.union(&old).cloned().collect();
         old = old.into_iter()
             .flat_map(|c| neighbors(&c))
             .filter(|c| grid.get(c).is_some())
             .collect::<HashSet<(u8, u8)>>()
             .difference(&group)
-            .map(|&x| x)
+            .cloned()
             .collect();
     }
     group

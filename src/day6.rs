@@ -31,12 +31,13 @@ impl MemoryBank {
     /// ```
     pub fn redistribute(&self) -> Self {
         let n = self.bank.len();
-        let (i_max, max) = self.bank.iter().enumerate().fold((0, 0), |(i_max, max),
-         (i, &val)| if val > max {
-            (i, val)
-        } else {
-            (i_max, max)
-        });
+        let (i_max, max) = self.bank
+            .iter()
+            .enumerate()
+            .fold(
+                (0, 0),
+                |(i_max, max), (i, &val)| if val > max { (i, val) } else { (i_max, max) },
+            );
         let q = max / n;
         let r = max % n;
         let mut new_bank = self.clone();

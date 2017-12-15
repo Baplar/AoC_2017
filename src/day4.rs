@@ -21,7 +21,7 @@ pub fn valid(s: &str) -> bool {
 
 /// Counts the number of valid passphrases in the input
 pub fn one(s: &str) -> String {
-    s.split("\n").filter(|&s| valid(s)).count().to_string()
+    s.split('\n').filter(|&s| valid(s)).count().to_string()
 }
 
 /// Sorts the characters of a word
@@ -64,7 +64,7 @@ pub fn valid_anagram(s: &str) -> bool {
 /// Counts the number of valid passphrases in the input,
 /// banning anagrams
 pub fn two(s: &str) -> String {
-    s.split("\n")
+    s.split('\n')
         .filter(|&s| valid_anagram(s))
         .count()
         .to_string()

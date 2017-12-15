@@ -1,12 +1,14 @@
 /// Parses a single line describing a scanner
 fn parse_scanner(s: &str) -> Result<(usize, usize), String> {
     let mut it = s.trim().split(": ");
-    let depth = it.next().ok_or("Missing depth")?.parse().map_err(|e| {
-        format!("Could not parse depth as int: {}", e)
-    })?;
-    let range = it.next().ok_or("Missing range")?.parse().map_err(|e| {
-        format!("Could not parse range as int: {}", e)
-    })?;
+    let depth = it.next()
+        .ok_or("Missing depth")?
+        .parse()
+        .map_err(|e| format!("Could not parse depth as int: {}", e))?;
+    let range = it.next()
+        .ok_or("Missing range")?
+        .parse()
+        .map_err(|e| format!("Could not parse range as int: {}", e))?;
     Ok((depth, range))
 }
 
@@ -14,7 +16,7 @@ fn parse_scanner(s: &str) -> Result<(usize, usize), String> {
 /// provided in the input
 fn parse_scanners(s: &str) -> Vec<(usize, usize)> {
     s.trim()
-        .split("\n")
+        .split('\n')
         .filter_map(|line| parse_scanner(line).ok())
         .collect()
 }
@@ -77,10 +79,7 @@ pub fn one(s: &str) -> String {
 pub fn two(s: &str) -> String {
     let scanners = parse_scanners(s);
     (0..)
-        .filter(|&offset| {
-            scanners.iter().all(|&(d, r)| !penalty(d, r, offset))
-        })
-        .next()
+        .find(|&offset| scanners.iter().all(|&(d, r)| !penalty(d, r, offset)))
         .unwrap_or(0)
         .to_string()
 }

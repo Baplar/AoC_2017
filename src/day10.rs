@@ -1,10 +1,6 @@
 /// Creates an initial list, with increasing values
 pub fn new_list() -> Vec<u8> {
-    let mut list = vec![];
-    for i in 0..256 {
-        list.push(i as u8);
-    }
-    list
+    (0..256).map(|x| x as u8).collect()
 }
 
 /// Ties a knot in the list
@@ -36,7 +32,7 @@ pub fn knot(list: &mut Vec<u8>, position: usize, length: usize) {
 /// assert_eq!(12, last_pos);
 /// assert_eq!(3, last_skip);
 /// ```
-pub fn hash_round(lengths: &Vec<usize>) -> (Vec<u8>, usize, usize) {
+pub fn hash_round(lengths: &[usize]) -> (Vec<u8>, usize, usize) {
     let mut list = new_list();
     let mut position = 0;
     let mut skip = 0;
@@ -59,7 +55,7 @@ pub fn hash_round(lengths: &Vec<usize>) -> (Vec<u8>, usize, usize) {
 /// ```
 pub fn parse_lengths(s: &str) -> Vec<usize> {
     s.trim()
-        .split(",")
+        .split(',')
         .filter_map(|s| s.trim().parse().ok())
         .collect()
 }
@@ -101,7 +97,7 @@ pub struct Hasher {
 impl Hasher {
     /// Passes a round of hashing on its internal state
     pub fn hash_round(&mut self) {
-        for &length in self.lengths.iter() {
+        for &length in &self.lengths {
             knot(&mut self.list, self.position, length);
             self.position = (self.position + length + self.skip) % self.list.len();
             self.skip = (self.skip + 1) % self.list.len();
@@ -118,11 +114,10 @@ impl Hasher {
 /// assert_eq!(vec![64], densify(sparse));
 /// ```
 pub fn densify(sparse: Vec<u8>) -> Vec<u8> {
-    let mut it = sparse.into_iter();
     let mut dense_hash = vec![];
     let mut group = 0;
     let mut group_size = 0;
-    while let Some(x) = it.next() {
+    for x in sparse {
         group ^= x;
         group_size += 1;
         if group_size == 16 {
@@ -167,7 +162,7 @@ pub fn knot_hash(s: &str) -> Vec<u8> {
 /// assert_eq!(two("1,2,4"), "63960835bcdc130f0b66d7ff4f6a5a8e");
 /// ```
 pub fn two(s: &str) -> String {
-    knot_hash(s).into_iter().fold(String::new(), |s, u| {
-        s + &format!("{:02x}", u)
-    })
+    knot_hash(s)
+        .into_iter()
+        .fold(String::new(), |s, u| s + &format!("{:02x}", u))
 }

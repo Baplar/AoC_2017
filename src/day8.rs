@@ -30,13 +30,10 @@ pub struct Instruction {
 
 /// Parses a complete block of instruction
 pub fn parse(s: &str) -> Vec<Instruction> {
-    let mut v = Vec::new();
-    for line in s.trim().split("\n") {
-        if let Ok(i) = parse_instruction(line) {
-            v.push(i);
-        };
-    }
-    v
+    s.trim()
+        .split('\n')
+        .filter_map(|line| parse_instruction(line).ok())
+        .collect()
 }
 
 /// Parses a single instruction, checking its validity
@@ -75,11 +72,11 @@ pub fn parse_instruction(s: &str) -> Result<Instruction, String> {
         x => Err(format!("Unknown comparator {}", x))?,
     };
 
-    let cond = tokens.next().ok_or("Missing condition")?.parse().map_err(
-        |e| {
-            format!("Could not parse condition as int: {}", e)
-        },
-    )?;
+    let cond = tokens
+        .next()
+        .ok_or("Missing condition")?
+        .parse()
+        .map_err(|e| format!("Could not parse condition as int: {}", e))?;
 
     Ok(Instruction {
         target,
@@ -145,7 +142,7 @@ pub fn eval(i: &Instruction, regs: &mut Registers) {
 
 /// Evaluates all the provided instructions on a blank register bank,
 /// and returns the resulting register bank
-pub fn eval_all(v: &Vec<Instruction>) -> Registers {
+pub fn eval_all(v: &[Instruction]) -> Registers {
     let mut regs = Registers::new();
     for i in v {
         eval(i, &mut regs);

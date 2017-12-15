@@ -165,7 +165,7 @@ fn parse_dir(s: &str) -> Direction {
 
 /// Parses a list of directions
 fn parse_path(s: &str) -> Vec<Direction> {
-    s.trim().split(",").map(|s| parse_dir(s.trim())).collect()
+    s.trim().split(',').map(|s| parse_dir(s.trim())).collect()
 }
 
 /// Finds the minimal number of steps to reach a child
@@ -180,13 +180,12 @@ fn parse_path(s: &str) -> Vec<Direction> {
 /// assert_eq!("3", one("se,sw,se,sw,sw"));
 /// ```
 pub fn one(s: &str) -> String {
-    let mut path = parse_path(s).into_iter().fold(
-        Path::new(),
-        |mut path, ref dir| {
+    let mut path = parse_path(s)
+        .into_iter()
+        .fold(Path::new(), |mut path, ref dir| {
             path.step(dir);
             path
-        },
-    );
+        });
     path.shortest_dist().to_string()
 }
 
@@ -204,7 +203,7 @@ pub fn two(s: &str) -> String {
     let dirs = parse_path(s);
     let mut path = Path::new();
     let mut max_dist = 0;
-    for dir in dirs.into_iter() {
+    for dir in dirs {
         path.short_step(&dir);
         max_dist = max_dist.max(path.dist());
     }

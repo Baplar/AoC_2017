@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 use std::collections::HashMap;
-use regex::{Regex, Error};
+use regex::{Error, Regex};
 
 struct Parser {
     re: Regex,
@@ -16,9 +16,9 @@ impl Parser {
     fn parse_pipe(&self, s: &str) -> Result<(usize, HashSet<usize>), String> {
         let caps = self.re.captures(s.trim()).ok_or("Not a pipe definition")?;
 
-        let first: usize = caps[1].parse().map_err(
-            |e| format!("Could not parse first: {}", e),
-        )?;
+        let first: usize = caps[1]
+            .parse()
+            .map_err(|e| format!("Could not parse first: {}", e))?;
 
         let neighbors = caps[2].split(", ").filter_map(|n| n.parse().ok()).collect();
 
@@ -28,11 +28,10 @@ impl Parser {
     /// Parses a list of pipe definitions
     /// /!\ The list must be ordered by root and complete
     fn parse_neighbors(&self, s: &str) -> HashMap<usize, HashSet<usize>> {
-        let v = s.trim()
-            .split("\n")
+        s.trim()
+            .split('\n')
             .filter_map(|s| self.parse_pipe(s.trim()).ok())
-            .collect();
-        v
+            .collect()
     }
 }
 
@@ -42,14 +41,14 @@ fn reduce_group(pipes: &HashMap<usize, HashSet<usize>>, root: usize) -> HashSet<
     let mut group = HashSet::new();
     let mut old = HashSet::new();
     old.insert(root);
-    while old.len() > 0 {
-        group = group.union(&old).map(|&x| x).collect();
+    while !old.is_empty() {
+        group = group.union(&old).cloned().collect();
         old = old.iter()
             .fold(HashSet::new(), |new, x| {
-                new.union(&pipes[x]).map(|&x| x).collect()
+                new.union(&pipes[x]).cloned().collect()
             })
             .difference(&group)
-            .map(|&x| x)
+            .cloned()
             .collect();
     }
     group
@@ -98,11 +97,11 @@ pub fn two(s: &str) -> String {
     let parser = Parser::new().unwrap();
     let mut pipes = parser.parse_neighbors(s);
     let mut groups = Vec::new();
-    while pipes.len() > 0 {
+    while !pipes.is_empty() {
         let (&root, _) = pipes.iter().next().unwrap();
         let group = reduce_group(&pipes, root);
-        for x in group.iter() {
-            pipes.remove(&x);
+        for x in &group {
+            pipes.remove(x);
         }
         groups.push(group);
     }

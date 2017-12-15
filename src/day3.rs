@@ -12,13 +12,11 @@ struct Cell {
 fn spiral_coord_from_index(index: u64) -> Cell {
     // Let us determine the side length of the smallest square
     // centered around the cell #1 containing the index:
-    let square_length = {
-        let mut side = 1;
-        while index > side * side {
-            side += 2;
-        }
-        side - 1 // side elements => length side-1
-    };
+    let square_length = (0..)
+        .map(|x| 2 * x + 1)
+        .skip_while(|&x| index > x * x)
+        .next()
+        .unwrap_or(1) - 1;
 
     if square_length < 2 {
         // Center of the spiral

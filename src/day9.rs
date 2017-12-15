@@ -1,6 +1,6 @@
 use std::str::Chars;
 
-/// Parses the content of a well-formed croup,
+/// Parses the content of a well-formed group,
 /// and returns the corresponding group score
 fn parse_group_score(stream: &mut Chars, level: usize) -> usize {
     let mut score = level;

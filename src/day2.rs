@@ -22,7 +22,7 @@ fn checksum_one(s: &str) -> u32 {
 /// assert_eq!("18", one(spreadsheet));
 /// ```
 pub fn one(s: &str) -> String {
-    let result: u32 = s.split("\n").map(checksum_one).sum();
+    let result: u32 = s.split('\n').map(checksum_one).sum();
     result.to_string()
 }
 
@@ -61,6 +61,6 @@ fn checksum_two(s: &str) -> u32 {
 /// assert_eq!("9", two(spreadsheet));
 /// ```
 pub fn two(s: &str) -> String {
-    let result: u32 = s.split("\n").map(checksum_two).sum();
+    let result: u32 = s.split('\n').map(checksum_two).sum();
     result.to_string()
 }

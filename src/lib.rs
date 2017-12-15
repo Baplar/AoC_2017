@@ -12,13 +12,16 @@ pub mod day11;
 pub mod day12;
 pub mod day13;
 pub mod day14;
+pub mod day15;
 
 use std::fs::File;
 use std::io::Read;
 extern crate regex;
 
+pub type Solver = fn(&str) -> String;
+
 /// Get the solver function correpsonding to the day and part
-pub fn get_solver(day: u32, part: u32) -> Option<fn(&str) -> String> {
+pub fn get_solver(day: u32, part: u32) -> Option<Solver> {
     match (day, part) {
         (1, 1) => Some(day1::one),
         (1, 2) => Some(day1::two),
@@ -48,6 +51,8 @@ pub fn get_solver(day: u32, part: u32) -> Option<fn(&str) -> String> {
         (13, 2) => Some(day13::two),
         (14, 1) => Some(day14::one),
         (14, 2) => Some(day14::two),
+        (15, 1) => Some(day15::one),
+        (15, 2) => Some(day15::two),
         _ => None,
     }
 }
