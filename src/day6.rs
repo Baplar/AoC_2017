@@ -31,13 +31,12 @@ impl MemoryBank {
     /// ```
     pub fn redistribute(&self) -> Self {
         let n = self.bank.len();
-        let (i_max, max) = self.bank
+        let (i_max, &max) = self.bank
             .iter()
             .enumerate()
-            .fold(
-                (0, 0),
-                |(i_max, max), (i, &val)| if val > max { (i, val) } else { (i_max, max) },
-            );
+            .rev()
+            .max_by_key(|&(_, val)| val)
+            .unwrap_or((0, &0));
         let q = max / n;
         let r = max % n;
         let mut new_bank = self.clone();
@@ -86,7 +85,7 @@ pub fn two(s: &str) -> String {
     let mut bank = MemoryBank::new(s);
     let mut all_banks = vec![];
     let mut i = 0;
-    let j = loop {
+    let l = loop {
         if let Some(j) = all_banks.iter().position(|b| *b == bank) {
             break i - j;
         }
@@ -95,5 +94,5 @@ pub fn two(s: &str) -> String {
         bank = new_bank;
         i += 1;
     };
-    j.to_string()
+    l.to_string()
 }
