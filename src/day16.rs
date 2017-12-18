@@ -184,10 +184,7 @@ where
     }
 
     fn permute_name(&mut self, q: &HashMap<T, T>) {
-        *self = self.into_iter()
-            .filter_map(|x| q.get(x))
-            .cloned()
-            .collect()
+        *self = self.into_iter().filter_map(|x| q.get(x)).cloned().collect()
     }
 }
 
@@ -206,8 +203,8 @@ where
 /// let p2 = repeat_p(&p, 2);
 /// assert_eq!(p1, p2);
 /// ```
-pub fn repeat_p(p: &Vec<usize>, mut n: usize) -> Vec<usize> {
-    let mut exponent: Vec<usize> = p.clone();
+pub fn repeat_p(p: &[usize], mut n: usize) -> Vec<usize> {
+    let mut exponent: Vec<usize> = p.to_vec();
     let mut new_p: Vec<usize> = (0..16).collect();
     while n > 0 {
         if n & 1 > 0 {
