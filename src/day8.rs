@@ -136,7 +136,7 @@ pub fn eval(i: &Instruction, regs: &mut Registers) {
             INC => edited + i.val,
             DEC => edited - i.val,
         };
-        regs.insert(i.target.clone(), edited);
+        regs.insert(i.target.to_owned(), edited);
     }
 }
 

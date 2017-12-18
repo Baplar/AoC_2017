@@ -43,9 +43,9 @@ fn reduce_group(pipes: &HashMap<usize, HashSet<usize>>, root: usize) -> HashSet<
     old.insert(root);
     while !old.is_empty() {
         group = group.union(&old).cloned().collect();
-        old = old.iter()
+        old = old.into_iter()
             .fold(HashSet::new(), |new, x| {
-                new.union(&pipes[x]).cloned().collect()
+                new.union(&pipes[&x]).cloned().collect()
             })
             .difference(&group)
             .cloned()

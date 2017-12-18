@@ -137,7 +137,7 @@ pub fn one(s: &str) -> String {
     for m in &moves {
         dancers.perform(m);
     }
-    dancers.iter().collect()
+    dancers.into_iter().collect()
 }
 
 /// Simplifies a sequence of moves into 2 permutations "matrices"
@@ -156,7 +156,7 @@ fn reduce(moves: &[Move<char>]) -> (Vec<usize>, HashMap<char, char>) {
     }
 
     let p = pos.into_iter()
-        .map(|a| INITIAL_DANCERS.chars().position(|b| a == b).unwrap())
+        .filter_map(|a| INITIAL_DANCERS.chars().position(|b| a == b))
         .collect();
 
     let q = INITIAL_DANCERS.chars().zip(name).collect();
@@ -177,17 +177,17 @@ where
     T: Eq + Hash + Clone,
 {
     fn permute_pos(&mut self, p: &[usize]) {
-        let mut v = vec![];
-        for &i in p {
-            if let Some(x) = self.get(i) {
-                v.push(x.clone());
-            }
-        }
-        *self = v;
+        *self = p.into_iter()
+            .filter_map(|&i| self.get(i))
+            .cloned()
+            .collect();
     }
 
     fn permute_name(&mut self, q: &HashMap<T, T>) {
-        *self = self.into_iter().filter_map(|x| q.get(x)).cloned().collect()
+        *self = self.into_iter()
+            .filter_map(|x| q.get(x))
+            .cloned()
+            .collect()
     }
 }
 
@@ -199,21 +199,22 @@ where
 /// let mut p: Vec<usize> = (0..16).collect();
 /// p[5] = 12;
 /// p[12] = 5;
-/// let p2 = repeat_p(p.clone(), 1);
+/// let p2 = repeat_p(&p, 1);
 /// assert_eq!(p, p2);
 ///
 /// let p1: Vec<usize> = (0..16).collect();
-/// let p2 = repeat_p(p.clone(), 2);
+/// let p2 = repeat_p(&p, 2);
 /// assert_eq!(p1, p2);
 /// ```
-pub fn repeat_p(mut p: Vec<usize>, mut n: usize) -> Vec<usize> {
+pub fn repeat_p(p: &Vec<usize>, mut n: usize) -> Vec<usize> {
+    let mut exponent: Vec<usize> = p.clone();
     let mut new_p: Vec<usize> = (0..16).collect();
     while n > 0 {
         if n & 1 > 0 {
-            new_p.permute_pos(&p);
+            new_p.permute_pos(&exponent);
         }
-        let p_copy = p.clone();
-        p.permute_pos(&p_copy);
+        let exp_copy = exponent.clone();
+        exponent.permute_pos(&exp_copy);
         n >>= 1;
     }
     new_p
@@ -222,7 +223,7 @@ pub fn repeat_p(mut p: Vec<usize>, mut n: usize) -> Vec<usize> {
 /// Permutes a hashmap with another one
 fn permute_hashmap(m: &HashMap<char, char>, q: &HashMap<char, char>) -> HashMap<char, char> {
     m.into_iter()
-        .map(|(a, b)| (*a, *q.get(b).unwrap()))
+        .map(|(a, b)| (*a, *q.get(b).unwrap_or(a)))
         .collect()
 }
 
@@ -239,26 +240,27 @@ fn permute_hashmap(m: &HashMap<char, char>, q: &HashMap<char, char>) -> HashMap<
 /// q.insert('b', 'd');
 /// q.insert('c', 'c');
 /// q.insert('d', 'a');
-/// let q2 = repeat_q(q.clone(), 1);
+/// let q2 = repeat_q(&q, 1);
 /// assert_eq!(q, q2);
 ///
 /// let mut q1 = q.clone();
 /// q1.insert('a', 'd');
 /// q1.insert('b', 'a');
 /// q1.insert('d', 'b');
-/// let q2 = repeat_q(q.clone(), 2);
+/// let q2 = repeat_q(&q, 2);
 /// assert_eq!(q1, q2);
 /// ```
-pub fn repeat_q(mut q: HashMap<char, char>, mut n: usize) -> HashMap<char, char> {
+pub fn repeat_q(q: &HashMap<char, char>, mut n: usize) -> HashMap<char, char> {
     let mut new_q: HashMap<char, char> = INITIAL_DANCERS
         .chars()
         .zip(INITIAL_DANCERS.chars())
         .collect();
+    let mut exponent = q.clone();
     while n > 0 {
         if n & 1 > 0 {
-            new_q = permute_hashmap(&new_q, &q);
+            new_q = permute_hashmap(&new_q, &exponent);
         }
-        q = permute_hashmap(&q, &q);
+        exponent = permute_hashmap(&exponent, &exponent);
         n >>= 1;
     }
     new_q
@@ -269,12 +271,12 @@ pub fn repeat_q(mut q: HashMap<char, char>, mut n: usize) -> HashMap<char, char>
 pub fn two(s: &str) -> String {
     let moves = parse(s);
     let (p, q) = reduce(&moves);
-    let p = repeat_p(p, 1_000_000_000);
-    let q = repeat_q(q, 1_000_000_000);
+    let p = repeat_p(&p, 1_000_000_000);
+    let q = repeat_q(&q, 1_000_000_000);
 
     let mut dancers: Vec<char> = INITIAL_DANCERS.chars().collect();
     dancers.permute_pos(&p);
     dancers.permute_name(&q);
 
-    dancers.iter().collect()
+    dancers.into_iter().collect()
 }
