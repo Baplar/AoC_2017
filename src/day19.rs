@@ -72,7 +72,9 @@ pub struct Packet<'a> {
 impl<'a> Packet<'a> {
     /// Initialises the packet on the grid
     fn new(grid: &'a HashMap<Point, Cell>) -> Packet {
-        let &point = grid.keys().find(|&p| p.y == 0).unwrap();
+        let &point = grid.keys()
+            .find(|&p| p.y == 0)
+            .expect("No entry point on row 0 of the grid");
         Packet {
             pos: point + Point::new(0, -1),
             dir: Point::new(0, 1),

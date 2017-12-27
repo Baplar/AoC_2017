@@ -83,7 +83,7 @@ impl Parser {
         let values: Vec<isize> = caps.iter()
             .skip(1)
             .take(9)
-            .map(|s| s.unwrap().as_str().parse::<isize>().unwrap())
+            .filter_map(|s| s?.as_str().parse::<isize>().ok())
             .collect();
 
         let p = Point::new(values[0], values[1], values[2]);

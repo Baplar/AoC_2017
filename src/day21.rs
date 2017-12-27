@@ -174,9 +174,9 @@ fn iterate(rules: &[Rule], fractal: &[bool]) -> Vec<bool> {
         .into_iter()
         .map(|s| {
             rules
-                .iter()
+                .into_iter()
                 .find(|r| r.match_rule(&s))
-                .unwrap()
+                .expect(&format!("No rule matches this cell pattern:\n{:?}", s))
                 .result
                 .clone()
         })

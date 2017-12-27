@@ -33,7 +33,7 @@ fn to_row(v: Vec<u8>) -> Vec<u8> {
 pub fn grid(key: &str) -> HashSet<(u8, u8)> {
     (0..128)
         .map(|j| (j as u8, format!("{}-{}", key, j)))
-        .map(|(j, s)| (j, knot_hash(s.as_str())))
+        .map(|(j, s)| (j, knot_hash(&s)))
         .map(|(j, h)| (j, to_row(h)))
         .flat_map(|(j, r)| r.into_iter().map(move |i| (i, j)))
         .collect()

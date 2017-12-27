@@ -38,7 +38,7 @@ where
     /// use advent_of_code::day16::Dance;
     /// let mut v = vec!['a', 'b', 'c', 'd', 'e'];
     /// v.spin(1);
-    /// assert_eq!("eabcd", v.iter().collect::<String>());
+    /// assert_eq!("eabcd", v.into_iter().collect::<String>());
     /// ```
     fn spin(&mut self, n: usize) {
         let size = self.len();
@@ -53,7 +53,7 @@ where
     /// use advent_of_code::day16::Dance;
     /// let mut v = vec!['e', 'a', 'b', 'c', 'd'];
     /// v.swap(3, 4);
-    /// assert_eq!("eabdc", v.iter().collect::<String>());
+    /// assert_eq!("eabdc", v.into_iter().collect::<String>());
     /// ```
     fn exchange(&mut self, a: usize, b: usize) {
         self.swap(a, b);
@@ -65,7 +65,7 @@ where
     /// use advent_of_code::day16::Dance;
     /// let mut v = vec!['e', 'a', 'b', 'd', 'c'];
     /// v.partner(&'e', &'b');
-    /// assert_eq!("baedc", v.iter().collect::<String>());
+    /// assert_eq!("baedc", v.into_iter().collect::<String>());
     /// ```
     fn partner(&mut self, a: &T, b: &T) {
         let pos_a = self.iter().position(|x| *x == *a).unwrap_or(0);

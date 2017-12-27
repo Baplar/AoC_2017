@@ -71,7 +71,7 @@ fn reduce_group(pipes: &HashMap<usize, HashSet<usize>>, root: usize) -> HashSet<
 /// assert_eq!("6", one(pipes));
 /// ```
 pub fn one(s: &str) -> String {
-    let parser = Parser::new().unwrap();
+    let parser = Parser::new().expect("Could not create parser");
     let pipes = parser.parse_neighbors(s);
     let group = reduce_group(&pipes, 0);
     group.len().to_string()
@@ -94,11 +94,11 @@ pub fn one(s: &str) -> String {
 /// assert_eq!("2", two(pipes));
 /// ```
 pub fn two(s: &str) -> String {
-    let parser = Parser::new().unwrap();
+    let parser = Parser::new().expect("Could not create parser");
     let mut pipes = parser.parse_neighbors(s);
     let mut groups = Vec::new();
     while !pipes.is_empty() {
-        let (&root, _) = pipes.iter().next().unwrap();
+        let &root = pipes.keys().next().unwrap();
         let group = reduce_group(&pipes, root);
         for x in &group {
             pipes.remove(x);
