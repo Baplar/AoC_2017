@@ -1,12 +1,12 @@
 use std::collections::HashMap;
 use std::ops::Add;
-use self::Dir::{Left, Right, Reverse};
-use self::Flag::{Clean, Weakened, Infected, Flagged};
+use self::Dir::{Left, Reverse, Right};
+use self::Flag::{Clean, Flagged, Infected, Weakened};
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 struct Cell {
     x: isize,
-    y: isize
+    y: isize,
 }
 
 #[derive(Clone, Copy, PartialEq)]
@@ -25,38 +25,32 @@ enum Dir {
 
 impl Cell {
     fn new(x: isize, y: isize) -> Cell {
-        Cell {x, y}
+        Cell { x, y }
     }
 
-    fn turn(&self, d: Dir) -> Cell {
-        let (x, y) = match d {
-            Left => {
-                match (self.x, self.y) {
-                    (0,1) => (1,0),
-                    (1,0) => (0,-1),
-                    (0,-1) => (-1,0),
-                    (-1,0) => (0,1),
-                    _ => (0,-1)
-                }
+    fn turn(&self, d: &Dir) -> Cell {
+        let (x, y) = match *d {
+            Left => match (self.x, self.y) {
+                (0, 1) => (1, 0),
+                (1, 0) => (0, -1),
+                (0, -1) => (-1, 0),
+                (-1, 0) => (0, 1),
+                _ => (0, 0),
             },
-            Right => {
-                match (self.x, self.y) {
-                    (1,0) => (0,1),
-                    (0,1) => (-1,0),
-                    (-1,0) => (0,-1),
-                    (0,-1) => (1,0),
-                    _ => (0,-1)
-                }
+            Right => match (self.x, self.y) {
+                (1, 0) => (0, 1),
+                (0, 1) => (-1, 0),
+                (-1, 0) => (0, -1),
+                (0, -1) => (1, 0),
+                _ => (0, 0),
             },
-            Reverse => {
-                match (self.x, self.y) {
-                    (1,0) => (-1,0),
-                    (-1,0) => (1,0),
-                    (0,1) => (0,-1),
-                    (0,-1) => (0,1),
-                    _ => (0,-1)
-                }
-            }
+            Reverse => match (self.x, self.y) {
+                (1, 0) => (-1, 0),
+                (-1, 0) => (1, 0),
+                (0, 1) => (0, -1),
+                (0, -1) => (0, 1),
+                _ => (0, 0),
+            },
         };
         Cell::new(x, y)
     }
@@ -68,7 +62,7 @@ impl Add for Cell {
     fn add(self, other: Self) -> Self::Output {
         Cell {
             x: self.x + other.x,
-            y: self.y + other.y
+            y: self.y + other.y,
         }
     }
 }
@@ -101,7 +95,7 @@ impl Grid {
             grid,
             carrier: Cell::new(pos, pos),
             direction: Cell::new(0, -1),
-            simple
+            simple,
         }
     }
 
@@ -110,53 +104,52 @@ impl Grid {
         match flag {
             Clean => {
                 let f = Weakened;
-                self.direction = self.direction.turn(Left);
+                self.direction = self.direction.turn(&Left);
                 self.grid.insert(self.carrier, f);
                 self.carrier = self.carrier + self.direction;
-                return f;
-            },
+                f
+            }
             Weakened => {
                 let f = Infected;
                 self.grid.insert(self.carrier, f);
                 self.carrier = self.carrier + self.direction;
-                return f;
+                f
             }
             Infected => {
                 let f = Flagged;
-                self.direction = self.direction.turn(Right);
+                self.direction = self.direction.turn(&Right);
                 self.grid.insert(self.carrier, f);
                 self.carrier = self.carrier + self.direction;
-                return f;
-            },
+                f
+            }
             Flagged => {
                 let f = Clean;
-                self.direction = self.direction.turn(Reverse);
+                self.direction = self.direction.turn(&Reverse);
                 self.grid.insert(self.carrier, f);
                 self.carrier = self.carrier + self.direction;
-                return f;
+                f
             }
         }
     }
-
 
     fn simple_step(&mut self) -> Flag {
         let flag = *self.grid.entry(self.carrier).or_insert_with(|| Clean);
         match flag {
             Clean => {
                 let f = Infected;
-                self.direction = self.direction.turn(Left);
+                self.direction = self.direction.turn(&Left);
                 self.grid.insert(self.carrier, f);
                 self.carrier = self.carrier + self.direction;
-                return f;
-            },
+                f
+            }
             Infected => {
                 let f = Clean;
-                self.direction = self.direction.turn(Right);
+                self.direction = self.direction.turn(&Right);
                 self.grid.insert(self.carrier, f);
                 self.carrier = self.carrier + self.direction;
-                return f;
-            },
-            x => x
+                f
+            }
+            x => x,
         }
     }
 }
@@ -174,9 +167,9 @@ impl Iterator for Grid {
     }
 }
 
-/// Counts the number of bursts among the first 10_000
+/// Counts the number of bursts among the first `10_000`
 /// that lead to a cell becoming infected.
-/// 
+///
 /// # Examples
 /// ```
 /// use advent_of_code::day22::one;
@@ -194,9 +187,9 @@ pub fn one(s: &str) -> String {
         .to_string()
 }
 
-/// Counts the number of bursts among the first 10_000_000
+/// Counts the number of bursts among the first `10_000_000`
 /// that lead to a cell becoming infected.
-/// 
+///
 /// # Examples
 /// ```
 /// use advent_of_code::day22::two;
