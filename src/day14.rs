@@ -85,8 +85,7 @@ fn reduce_group(root: (u8, u8), grid: &HashSet<(u8, u8)>) -> HashSet<(u8, u8)> {
 pub fn two(s: &str) -> String {
     let mut grid = grid(s);
     let mut nb_groups = 0;
-    while !grid.is_empty() {
-        let &root = grid.iter().next().unwrap();
+    while let Some(&root) = grid.iter().next() {
         let group = reduce_group(root, &grid);
         for x in group {
             grid.remove(&x);

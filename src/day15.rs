@@ -3,15 +3,11 @@ fn parse_input(s: &str) -> (usize, usize) {
     let v: Vec<usize> = s.trim()
         .split('\n')
         .take(2)
-        .map(|s| {
-            s.trim()
-                .split_whitespace()
-                .last()
-                .unwrap_or("0")
-                .parse()
-                .unwrap_or(0)
-        })
+        .filter_map(|s| s.trim().split_whitespace().last()?.parse().ok())
         .collect();
+    if v.len() < 2 {
+        return (0, 0);
+    }
     (v[0], v[1])
 }
 

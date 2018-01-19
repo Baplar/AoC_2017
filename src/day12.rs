@@ -97,8 +97,7 @@ pub fn two(s: &str) -> String {
     let parser = Parser::new().expect("Could not create parser");
     let mut pipes = parser.parse_neighbors(s);
     let mut groups = Vec::new();
-    while !pipes.is_empty() {
-        let &root = pipes.keys().next().unwrap();
+    while let Some(&root) = pipes.keys().next() {
         let group = reduce_group(&pipes, root);
         for x in &group {
             pipes.remove(x);
